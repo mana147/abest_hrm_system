@@ -1,0 +1,237 @@
+<%
+  const SPECIALTIES = [
+    'TOEIC Foundation','TOEIC Advanced',
+    'IELTS Pre','IELTS Intermediate','IELTS Advanced',
+    'Kids English','Giao tiếp','Business English','Pronunciation',
+  ];
+  const currentSpec = teacher ? (teacher.specialtyArr || []) : [];
+%>
+
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/teachers" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-person-badge me-1"></i><%= t('teachers.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)"><%= teacher ? t('common.edit') : t('teachers.add') %></span>
+</nav>
+
+<div class="page-header">
+  <div class="page-title">
+    <%= teacher ? t('common.edit') + ' — ' + teacher.full_name : t('teachers.add') %>
+  </div>
+  <% if (teacher) { %>
+    <div class="page-sub">
+      <%= lang==='vi' ? 'Mã giáo viên' : 'Teacher code' %>:
+      <code style="font-size:13px"><%= teacher.teacher_code %></code>
+    </div>
+  <% } %>
+</div>
+
+<form method="POST" action="<%= action %>" novalidate>
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <div class="col-lg-8">
+
+      <!-- Personal info -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-person me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Thông tin cá nhân' : 'Personal information' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('teachers.name') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="full_name" class="form-control"
+                     value="<%= teacher?.full_name || '' %>"
+                     placeholder="<%= lang==='vi' ? 'Nguyễn Thị Lan' : 'Jane Smith' %>"
+                     required autofocus>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Số điện thoại' : 'Phone' %>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <i class="bi bi-phone text-muted"></i>
+                </span>
+                <input type="tel" name="phone" class="form-control"
+                       value="<%= teacher?.phone || '' %>"
+                       placeholder="0912 345 678">
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">Email</label>
+              <div class="input-group">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <i class="bi bi-envelope text-muted"></i>
+                </span>
+                <input type="email" name="email" class="form-control"
+                       value="<%= teacher?.email || '' %>"
+                       placeholder="teacher@abest.edu.vn">
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Specialty -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-mortarboard me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Chuyên môn giảng dạy' : 'Teaching specialties' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <% SPECIALTIES.forEach(sp => { %>
+            <div class="col-6 col-md-4">
+              <label class="specialty-check d-flex align-items-center gap-2 p-2 rounded"
+                     style="cursor:pointer;border:1px solid var(--hairline);transition:all .15s"
+                     onmouseover="this.style.borderColor='var(--rausch)'"
+                     onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='var(--hairline)'">
+                <input type="checkbox" name="specialty" value="<%= sp %>"
+                       class="form-check-input mt-0 flex-shrink-0"
+                       style="accent-color:var(--rausch)"
+                       <%= currentSpec.includes(sp) ? 'checked' : '' %>
+                       onchange="updateSpecialtyStyle(this)">
+                <span style="font-size:13px;font-weight:500"><%= sp %></span>
+              </label>
+            </div>
+            <% }) %>
+          </div>
+          <p class="mt-2 mb-0" style="font-size:12px;color:var(--ash)">
+            <i class="bi bi-info-circle me-1"></i>
+            <%= lang==='vi' ? 'Chọn tất cả khóa học giáo viên có thể giảng dạy.' : 'Select all courses this teacher can teach.' %>
+          </p>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-journal me-2" style="color:var(--rausch)"></i>
+          <%= t('common.note') %>
+        </div>
+        <div class="card-body">
+          <textarea name="note" class="form-control" rows="3"
+                    placeholder="<%= lang==='vi' ? 'Ghi chú thêm về giáo viên...' : 'Additional notes...' %>"
+                    style="resize:vertical"><%= teacher?.note || '' %></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-lg-4">
+
+      <!-- Contract & Rate -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-briefcase me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Hợp đồng & Lương' : 'Contract & Rate' %>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:13px">
+              <%= t('teachers.type') %>
+            </label>
+            <div class="d-flex flex-column gap-2">
+              <% [
+                ['fulltime',  lang==='vi' ? 'Cơ hữu (Full-time)'       : 'Full-time',  'bi-building'],
+                ['parttime',  lang==='vi' ? 'Bán thời gian (Part-time)' : 'Part-time',  'bi-clock'],
+                ['freelance', 'Freelance',                                               'bi-person-workspace'],
+              ].forEach(([val, lbl, icon]) => { %>
+              <label class="d-flex align-items-center gap-2 p-2 rounded"
+                     style="cursor:pointer;border:1px solid var(--hairline)">
+                <input type="radio" name="teacher_type" value="<%= val %>"
+                       style="accent-color:var(--rausch)"
+                       <%= (!teacher && val==='fulltime') || teacher?.teacher_type===val ? 'checked':'' %>>
+                <i class="bi <%= icon %>" style="color:var(--ash)"></i>
+                <span style="font-size:13px;font-weight:500"><%= lbl %></span>
+              </label>
+              <% }) %>
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label fw-semibold" style="font-size:13px">
+              <%= lang==='vi' ? 'Lương / giờ (VNĐ)' : 'Hourly rate (VNĐ)' %>
+            </label>
+            <div class="input-group">
+              <input type="number" name="hourly_rate" class="form-control"
+                     value="<%= teacher?.hourly_rate || '' %>"
+                     min="0" step="5000"
+                     placeholder="150000">
+              <span class="input-group-text bg-white" style="border-color:var(--hairline);font-size:13px">₫/h</span>
+            </div>
+            <div class="mt-1" style="font-size:12px;color:var(--ash)">
+              <%= lang==='vi' ? 'Ví dụ: 150000 = 150.000 ₫/giờ' : 'E.g. 150000 = 150,000 ₫/hr' %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-sliders me-2" style="color:var(--rausch)"></i>
+          <%= t('common.status') %>
+        </div>
+        <div class="card-body">
+          <select name="status" class="form-select">
+            <option value="active"   <%= (!teacher || teacher.status==='active')   ? 'selected':'' %>>
+              ✓ <%= lang==='vi' ? 'Đang dạy' : 'Active' %>
+            </option>
+            <option value="inactive" <%= teacher?.status==='inactive' ? 'selected':'' %>>
+              — <%= lang==='vi' ? 'Ngừng hoạt động' : 'Inactive' %>
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-body d-flex flex-column gap-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check2 me-2"></i><%= t('common.save') %>
+          </button>
+          <a href="<%= teacher ? '/teachers/'+teacher.id : '/teachers' %>"
+             class="btn btn-outline-secondary w-100">
+            <i class="bi bi-x me-2"></i><%= t('common.cancel') %>
+          </a>
+          <% if (teacher && teacher.status !== 'inactive') { %>
+            <hr class="my-1">
+            <form method="POST" action="/teachers/<%= teacher.id %>/delete"
+                  onsubmit="return confirm('<%= lang==='vi' ? 'Ngừng hoạt động giáo viên này?' : 'Deactivate this teacher?' %>')">
+              <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                <i class="bi bi-person-dash me-2"></i>
+                <%= lang==='vi' ? 'Ngừng hoạt động' : 'Deactivate' %>
+              </button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+<script>
+function updateSpecialtyStyle(cb) {
+  const label = cb.closest('label');
+  label.style.borderColor = cb.checked ? 'var(--rausch)' : 'var(--hairline)';
+  label.style.background  = cb.checked ? '#fff0f3' : '';
+}
+// Init on load
+document.querySelectorAll('input[name="specialty"]').forEach(cb => {
+  if (cb.checked) updateSpecialtyStyle(cb);
+});
+</script>

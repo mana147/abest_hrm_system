@@ -1,0 +1,259 @@
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/students" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-people me-1"></i><%= t('students.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)">
+    <%= student ? t('common.edit') : t('students.add') %>
+  </span>
+</nav>
+
+<div class="page-header">
+  <div class="page-title">
+    <%= student ? t('common.edit') + ' — ' + student.full_name : t('students.add') %>
+  </div>
+  <% if (student) { %>
+    <div class="page-sub">
+      <%= lang==='vi' ? 'Mã học viên' : 'Student code' %>:
+      <code style="font-size:13px"><%= student.student_code %></code>
+    </div>
+  <% } %>
+</div>
+
+<form method="POST" action="<%= action %>" novalidate>
+
+  <div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-8">
+
+      <!-- Basic info -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-person me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Thông tin cơ bản' : 'Basic information' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <div class="col-md-8">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('students.name') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="full_name" class="form-control"
+                     value="<%= student?.full_name || '' %>"
+                     placeholder="<%= lang==='vi' ? 'Nguyễn Văn A' : 'John Smith' %>"
+                     required autofocus>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Giới tính' : 'Gender' %>
+              </label>
+              <select name="gender" class="form-select">
+                <option value="">—</option>
+                <option value="male"   <%= student?.gender==='male'   ? 'selected' : '' %>>
+                  <%= lang==='vi' ? 'Nam' : 'Male' %>
+                </option>
+                <option value="female" <%= student?.gender==='female' ? 'selected' : '' %>>
+                  <%= lang==='vi' ? 'Nữ' : 'Female' %>
+                </option>
+                <option value="other"  <%= student?.gender==='other'  ? 'selected' : '' %>>
+                  <%= lang==='vi' ? 'Khác' : 'Other' %>
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Ngày sinh' : 'Date of birth' %>
+              </label>
+              <input type="date" name="date_of_birth" class="form-control"
+                     value="<%= student?.date_of_birth ? new Date(student.date_of_birth).toISOString().split('T')[0] : '' %>">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Trình độ đầu vào' : 'Current level' %>
+              </label>
+              <select name="level_current" class="form-select">
+                <option value="">—</option>
+                <% ['beginner','elementary','pre_intermediate','intermediate','upper_intermediate','advanced'].forEach(lv => { %>
+                  <option value="<%= lv %>" <%= student?.level_current===lv ? 'selected' : '' %>><%= lv %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Địa chỉ' : 'Address' %>
+              </label>
+              <input type="text" name="address" class="form-control"
+                     value="<%= student?.address || '' %>"
+                     placeholder="<%= lang==='vi' ? 'Số nhà, đường, quận, thành phố' : 'Street, district, city' %>">
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-telephone me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Thông tin liên hệ' : 'Contact information' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('students.phone') %>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <i class="bi bi-phone text-muted"></i>
+                </span>
+                <input type="tel" name="phone" class="form-control"
+                       value="<%= student?.phone || '' %>"
+                       placeholder="0912 345 678">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('students.email') %>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <i class="bi bi-envelope text-muted"></i>
+                </span>
+                <input type="email" name="email" class="form-control"
+                       value="<%= student?.email || '' %>"
+                       placeholder="email@example.com">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parent -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-people me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Phụ huynh / Người liên hệ' : 'Parent / Guardian' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('students.parent') %>
+              </label>
+              <input type="text" name="parent_name" class="form-control"
+                     value="<%= student?.parent_name || '' %>"
+                     placeholder="<%= lang==='vi' ? 'Họ tên phụ huynh' : 'Parent full name' %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('students.parent_phone') %>
+              </label>
+              <input type="tel" name="parent_phone" class="form-control"
+                     value="<%= student?.parent_phone || '' %>"
+                     placeholder="0987 654 321">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-journal me-2" style="color:var(--rausch)"></i>
+          <%= t('common.note') %>
+        </div>
+        <div class="card-body">
+          <textarea name="note" class="form-control" rows="3"
+                    placeholder="<%= lang==='vi' ? 'Ghi chú thêm về học viên...' : 'Additional notes about the student...' %>"
+                    style="resize:vertical"><%= student?.note || '' %></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-4">
+
+      <!-- Status & Source -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-sliders me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Phân loại' : 'Classification' %>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:13px">
+              <%= t('common.status') %>
+            </label>
+            <select name="status" class="form-select">
+              <option value="active"    <%= (!student || student.status==='active')    ? 'selected' : '' %>>
+                <%= lang==='vi' ? '✓ Đang học' : '✓ Active' %>
+              </option>
+              <option value="graduated" <%= student?.status==='graduated' ? 'selected' : '' %>>
+                <%= lang==='vi' ? '🎓 Tốt nghiệp' : '🎓 Graduated' %>
+              </option>
+              <option value="dropped"   <%= student?.status==='dropped'   ? 'selected' : '' %>>
+                <%= lang==='vi' ? '✗ Đã nghỉ' : '✗ Dropped' %>
+              </option>
+              <option value="inactive"  <%= student?.status==='inactive'  ? 'selected' : '' %>>
+                <%= lang==='vi' ? '— Ngừng' : '— Inactive' %>
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label fw-semibold" style="font-size:13px">
+              <%= t('students.source') %>
+            </label>
+            <select name="source" class="form-select">
+              <option value="">—</option>
+              <% [
+                ['walk_in',  lang==='vi' ? 'Đến trực tiếp' : 'Walk-in'],
+                ['referral', lang==='vi' ? 'Giới thiệu'    : 'Referral'],
+                ['facebook', 'Facebook'],
+                ['zalo',     'Zalo'],
+                ['website',  'Website'],
+                ['tiktok',   'TikTok'],
+                ['other',    lang==='vi' ? 'Khác' : 'Other'],
+              ].forEach(([val, lbl]) => { %>
+                <option value="<%= val %>" <%= student?.source===val ? 'selected' : '' %>><%= lbl %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-body d-flex flex-column gap-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check2 me-2"></i><%= t('common.save') %>
+          </button>
+          <a href="<%= student ? '/students/' + student.id : '/students' %>"
+             class="btn btn-outline-secondary w-100">
+            <i class="bi bi-x me-2"></i><%= t('common.cancel') %>
+          </a>
+          <% if (student && student.status !== 'inactive') { %>
+            <hr class="my-1">
+            <form method="POST" action="/students/<%= student.id %>/delete"
+                  onsubmit="return confirm('<%= lang==='vi' ? 'Xác nhận ngừng hoạt động học viên này?' : 'Confirm deactivate this student?' %>')">
+              <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                <i class="bi bi-person-dash me-2"></i>
+                <%= lang==='vi' ? 'Ngừng hoạt động' : 'Deactivate' %>
+              </button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>

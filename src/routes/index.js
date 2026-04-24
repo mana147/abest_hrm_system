@@ -21,6 +21,12 @@ router.get('/language/:lang', (req, res) => {
 // Auth
 router.use('/auth', require('./auth'));
 
+// Students
+router.use('/students', require('./students'));
+
+// Teachers
+router.use('/teachers', require('./teachers'));
+
 // Landing page (public)
 router.get('/', (req, res) => {
   if (req.session.user) return res.redirect('/dashboard');

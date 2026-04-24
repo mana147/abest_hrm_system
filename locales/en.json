@@ -62,17 +62,24 @@
     "parent": "Parent Name",
     "parent_phone": "Parent Phone",
     "status": "Status",
-    "note": "Note"
+    "note": "Note",
+    "created": "Student created successfully",
+    "updated": "Updated successfully",
+    "deactivated": "Student deactivated"
   },
   "teachers": {
     "title": "Teacher Management",
     "add": "Add Teacher",
     "code": "Teacher Code",
     "name": "Full Name",
+    "phone": "Phone",
     "specialty": "Specialty",
     "type": "Contract Type",
     "hourly_rate": "Hourly Rate",
-    "status": "Status"
+    "status": "Status",
+    "created": "Teacher created successfully",
+    "updated": "Updated successfully",
+    "deactivated": "Teacher deactivated"
   },
   "classes": {
     "title": "Class Management",

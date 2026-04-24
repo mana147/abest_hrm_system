@@ -11,7 +11,12 @@
       "Bash(npm --version)",
       "Bash(mysql -u root -pHieu761321 -e \"SELECT VERSION\\(\\); SHOW DATABASES;\")",
       "Bash(brew list *)",
-      "Bash(npm i *)"
+      "Bash(npm i *)",
+      "Bash(node src/app.js)",
+      "Bash(curl -s -c /tmp/hrm3.txt -X POST http://localhost:3000/auth/login -d 'username=admin&password=Admin@123' -o /dev/null)",
+      "Bash(curl -s -b /tmp/hrm3.txt -o /dev/null -w \"GET /students          → HTTP %{http_code}\\\\n\" http://localhost:3000/students)",
+      "Bash(curl -s -b /tmp/hrm3.txt -o /dev/null -w \"GET /students/new      → HTTP %{http_code}\\\\n\" http://localhost:3000/students/new)",
+      "Bash(curl -s -b /tmp/hrm3.txt -c /tmp/hrm3.txt -X POST http://localhost:3000/students -d 'full_name=Nguyễn+Thị+Mai&phone=0912345678&email=mai@test.com&gender=female&level_current=elementary&source=facebook&status=active' -w 'POST /students         → HTTP %{http_code} → %{redirect_url}\\\\n' -o /dev/null)"
     ]
   }
 }

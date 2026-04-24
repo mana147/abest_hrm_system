@@ -1,0 +1,181 @@
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/teachers" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-person-badge me-1"></i><%= t('teachers.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)"><%= teacher.full_name %></span>
+</nav>
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+  <div class="d-flex align-items-center gap-3">
+    <!-- Avatar with type color -->
+    <%
+      const typeColors = { fulltime:'#2563eb', parttime:'#f59e0b', freelance:'#6a6a6a' };
+      const avatarColor = typeColors[teacher.teacher_type] || '#2563eb';
+    %>
+    <div style="width:56px;height:56px;border-radius:50%;background:<%= avatarColor %>;
+                display:flex;align-items:center;justify-content:center;
+                font-size:22px;font-weight:700;color:#fff;flex-shrink:0">
+      <%= teacher.full_name.charAt(0).toUpperCase() %>
+    </div>
+    <div>
+      <h5 class="mb-1 fw-bold" style="font-size:18px"><%= teacher.full_name %></h5>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <code style="font-size:12px;color:var(--ash)"><%= teacher.teacher_code %></code>
+        <%
+          const typeMap = {
+            fulltime:  { lbl: lang==='vi' ? 'Cơ hữu' : 'Full-time', cls:'badge-ongoing' },
+            parttime:  { lbl: lang==='vi' ? 'Bán thời gian' : 'Part-time', cls:'badge-planned' },
+            freelance: { lbl: 'Freelance', cls:'badge-inactive' },
+          };
+          const tm = typeMap[teacher.teacher_type] || { lbl: teacher.teacher_type, cls:'badge-inactive' };
+        %>
+        <span class="badge <%= tm.cls %>" style="padding:3px 10px"><%= tm.lbl %></span>
+        <span class="badge <%= teacher.status==='active' ? 'badge-active':'badge-inactive' %>" style="padding:3px 10px">
+          <%= teacher.status==='active' ? (lang==='vi' ? 'Đang dạy':'Active') : (lang==='vi' ? 'Ngừng':'Inactive') %>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/teachers/<%= teacher.id %>/edit" class="btn btn-primary">
+      <i class="bi bi-pencil me-2"></i><%= t('common.edit') %>
+    </a>
+    <a href="/teachers" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i><%= t('common.back') %>
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- LEFT -->
+  <div class="col-lg-8">
+
+    <!-- Info -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-person me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Thông tin giáo viên' : 'Teacher information' %>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-borderless mb-0">
+          <% [
+            [lang==='vi' ? 'Họ và tên'      : 'Full name',    teacher.full_name],
+            [lang==='vi' ? 'Số điện thoại'  : 'Phone',        teacher.phone || '—'],
+            ['Email',                                           teacher.email || '—'],
+            [lang==='vi' ? 'Loại hợp đồng'  : 'Contract',     tm.lbl],
+            [lang==='vi' ? 'Lương / giờ'    : 'Hourly rate',
+              teacher.hourly_rate > 0
+                ? Number(teacher.hourly_rate).toLocaleString('vi-VN') + ' ₫'
+                : '—'],
+          ].forEach(([label, value]) => { %>
+          <tr style="border-bottom:1px solid var(--hairline)">
+            <td style="width:180px;padding:12px 20px;font-size:13px;color:var(--ash);font-weight:500"><%= label %></td>
+            <td style="padding:12px 20px;font-size:14px;color:var(--ink)"><%= value %></td>
+          </tr>
+          <% }) %>
+        </table>
+      </div>
+    </div>
+
+    <!-- Specialties -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-mortarboard me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Chuyên môn giảng dạy' : 'Teaching specialties' %>
+      </div>
+      <div class="card-body">
+        <% if ((teacher.specialtyArr || []).length === 0) { %>
+          <span style="color:var(--ash);font-size:14px">—</span>
+        <% } else { %>
+          <div class="d-flex flex-wrap gap-2">
+            <% teacher.specialtyArr.forEach(sp => { %>
+              <span class="badge badge-ongoing" style="padding:6px 14px;font-size:13px;font-weight:500">
+                <i class="bi bi-check2 me-1"></i><%= sp %>
+              </span>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <% if (teacher.note) { %>
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-journal me-2" style="color:var(--rausch)"></i>
+        <%= t('common.note') %>
+      </div>
+      <div class="card-body">
+        <p class="mb-0" style="font-size:14px;color:var(--ink);white-space:pre-line;line-height:1.6">
+          <%= teacher.note %>
+        </p>
+      </div>
+    </div>
+    <% } %>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="col-lg-4">
+
+    <!-- Rate card -->
+    <div class="card mb-3" style="border-color:var(--hairline)">
+      <div class="card-body text-center py-4">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ash);margin-bottom:4px">
+          <%= lang==='vi' ? 'Lương / giờ' : 'Hourly Rate' %>
+        </div>
+        <div style="font-size:28px;font-weight:700;color:var(--ink)">
+          <% if (teacher.hourly_rate > 0) { %>
+            <%= Number(teacher.hourly_rate).toLocaleString('vi-VN') %>
+            <span style="font-size:16px;color:var(--ash)">₫/h</span>
+          <% } else { %>
+            <span style="color:var(--stone)">—</span>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- System -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <i class="bi bi-clock-history me-2" style="color:var(--rausch)"></i>
+        System
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-borderless mb-0">
+          <tr style="border-bottom:1px solid var(--hairline)">
+            <td style="padding:10px 16px;font-size:12px;color:var(--ash)">
+              <%= lang==='vi' ? 'Ngày tạo' : 'Created' %>
+            </td>
+            <td style="padding:10px 16px;font-size:13px;color:var(--ink)">
+              <%= new Date(teacher.created_at).toLocaleDateString(lang==='vi' ? 'vi-VN' : 'en-GB') %>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:10px 16px;font-size:12px;color:var(--ash)">Mã GV</td>
+            <td style="padding:10px 16px"><code style="font-size:13px"><%= teacher.teacher_code %></code></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card">
+      <div class="card-body d-flex flex-column gap-2">
+        <a href="/teachers/<%= teacher.id %>/edit" class="btn btn-primary w-100">
+          <i class="bi bi-pencil me-2"></i><%= t('common.edit') %>
+        </a>
+        <% if (teacher.status !== 'inactive') { %>
+          <form method="POST" action="/teachers/<%= teacher.id %>/delete"
+                onsubmit="return confirm('<%= lang==='vi' ? 'Ngừng hoạt động giáo viên?' : 'Deactivate this teacher?' %>')">
+            <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+              <i class="bi bi-person-dash me-2"></i>
+              <%= lang==='vi' ? 'Ngừng hoạt động' : 'Deactivate' %>
+            </button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

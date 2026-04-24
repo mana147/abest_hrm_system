@@ -62,17 +62,24 @@
     "parent": "Phụ huynh",
     "parent_phone": "SĐT phụ huynh",
     "status": "Trạng thái",
-    "note": "Ghi chú"
+    "note": "Ghi chú",
+    "created": "Đã thêm học viên thành công",
+    "updated": "Cập nhật thành công",
+    "deactivated": "Đã ngừng hoạt động học viên"
   },
   "teachers": {
     "title": "Quản lý giáo viên",
     "add": "Thêm giáo viên",
     "code": "Mã giáo viên",
     "name": "Họ và tên",
+    "phone": "Số điện thoại",
     "specialty": "Chuyên môn",
     "type": "Loại hợp đồng",
     "hourly_rate": "Lương/giờ",
-    "status": "Trạng thái"
+    "status": "Trạng thái",
+    "created": "Đã thêm giáo viên thành công",
+    "updated": "Cập nhật thành công",
+    "deactivated": "Đã ngừng hoạt động giáo viên"
   },
   "classes": {
     "title": "Quản lý lớp học",
