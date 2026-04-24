@@ -74,3 +74,33 @@ Hoàn thiện toàn bộ 17 bảng với:
 
 ### Output
 Viết chi tiết vào file mới: `brainstorm ideas/DbSchema.md`
+
+
+Gợi ý thứ tự build module (theo dependency chain):
+
+Tầng 1 — Master Data (không phụ thuộc gì): courses → timeslots → classrooms → teachers → students
+Tầng 2 — Scheduling lõi (phụ thuộc tầng 1): schedule_lines → classes → class_sessions (auto-generate)
+Tầng 3 — Vận hành (phụ thuộc tầng 2): enrollments → attendance
+Tầng 4 — Tài chính (phụ thuộc tầng 3): invoices → payments → teacher_payroll
+
+Nên build đầu tiên: students + teachers + courses — standalone, establish CRUD pattern cho mọi module sau, và business dùng được ngay.
+
+- bắt đầu build students , xong tôi sẽ đánh giá tiếp
+
+-----------------------------------
+
+Cách dùng
+
+- Mặc định: đồng bộ từ local sang remote
+npm run db:sync
+
+- Chỉ định nguồn và đích:
+npm run db:sync -- --from=remote --to=local
+
+- Chạy dry-run:
+npm run db:sync -- --dry-run
+
+Ghi chú
+Script đọc cấu hình từ mysql_info.md
+Nó tạo database hrm_system trên target nếu chưa tồn tại
+Sao chép schema và dữ liệu của các bảng trong database

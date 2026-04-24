@@ -4,6 +4,8 @@
 *.db-wal
 .DS_Store
 
+mysql_info.md
+
 # Logs
 logs
 *.log
