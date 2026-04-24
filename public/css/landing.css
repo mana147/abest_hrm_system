@@ -66,6 +66,7 @@ body {
   display: flex;
   gap: 8px;
   flex: 1;
+  margin: 1rem 0;
 }
 .lp-nav-links a {
   font-size: 14px; font-weight: 500; color: var(--ink);
