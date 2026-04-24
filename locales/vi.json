@@ -1,0 +1,108 @@
+{
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "search": "Tìm kiếm",
+    "actions": "Thao tác",
+    "status": "Trạng thái",
+    "note": "Ghi chú",
+    "created_at": "Ngày tạo",
+    "confirm_delete": "Bạn có chắc muốn xóa?",
+    "yes": "Có",
+    "no": "Không",
+    "active": "Đang hoạt động",
+    "inactive": "Ngừng hoạt động",
+    "back": "Quay lại",
+    "add_new": "Thêm mới",
+    "list": "Danh sách",
+    "total": "Tổng cộng",
+    "no_data": "Không có dữ liệu"
+  },
+  "nav": {
+    "dashboard": "Tổng quan",
+    "students": "Học viên",
+    "teachers": "Giáo viên",
+    "staff": "Nhân sự",
+    "classes": "Lớp học",
+    "schedule": "Lịch khai giảng",
+    "finance": "Tài chính",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "username": "Tên đăng nhập",
+    "password": "Mật khẩu",
+    "login_btn": "Đăng nhập",
+    "invalid_credentials": "Tên đăng nhập hoặc mật khẩu không đúng",
+    "account_inactive": "Tài khoản chưa được kích hoạt",
+    "please_login": "Vui lòng đăng nhập để tiếp tục"
+  },
+  "dashboard": {
+    "title": "Tổng quan hệ thống",
+    "total_students": "Học viên đang học",
+    "total_classes": "Lớp đang mở",
+    "total_teachers": "Giáo viên",
+    "revenue_month": "Doanh thu tháng",
+    "welcome": "Chào mừng trở lại"
+  },
+  "students": {
+    "title": "Quản lý học viên",
+    "add": "Thêm học viên",
+    "name": "Họ và tên",
+    "code": "Mã học viên",
+    "phone": "Số điện thoại",
+    "email": "Email",
+    "dob": "Ngày sinh",
+    "gender": "Giới tính",
+    "level": "Trình độ",
+    "source": "Nguồn",
+    "parent": "Phụ huynh",
+    "parent_phone": "SĐT phụ huynh",
+    "status": "Trạng thái",
+    "note": "Ghi chú"
+  },
+  "teachers": {
+    "title": "Quản lý giáo viên",
+    "add": "Thêm giáo viên",
+    "code": "Mã giáo viên",
+    "name": "Họ và tên",
+    "specialty": "Chuyên môn",
+    "type": "Loại hợp đồng",
+    "hourly_rate": "Lương/giờ",
+    "status": "Trạng thái"
+  },
+  "classes": {
+    "title": "Quản lý lớp học",
+    "add": "Thêm lớp",
+    "code": "Mã lớp",
+    "name": "Tên lớp",
+    "course": "Khóa học",
+    "teacher": "Giáo viên",
+    "classroom": "Phòng học",
+    "timeslot": "Khung giờ",
+    "start_date": "Ngày khai giảng",
+    "end_date": "Ngày kết thúc dự kiến",
+    "next_open": "Khai giảng tiếp theo",
+    "status": "Trạng thái",
+    "capacity": "Sĩ số",
+    "enrolled": "Đã ghi danh"
+  },
+  "schedule": {
+    "title": "Lịch khai giảng",
+    "lines": "Đường vận hành",
+    "next_available": "Có thể khai giảng"
+  },
+  "finance": {
+    "title": "Tài chính",
+    "invoices": "Hóa đơn",
+    "payments": "Thanh toán",
+    "payroll": "Lương giáo viên",
+    "amount": "Số tiền",
+    "due_date": "Hạn đóng",
+    "paid_at": "Ngày thanh toán",
+    "method": "Phương thức"
+  }
+}

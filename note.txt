@@ -1,0 +1,76 @@
+# Context
+
+File AiChatIdeas.md là tài liệu brainstorm cho hệ thống web app quản lý trung tâm (tiếng Anh, trung tâm ngoại ngữ/đào tạo). Người dùng muốn cùng tiếp tục lên ý tưởng thiết kế.
+
+## Những gì đã có trong file (27 sections)
+
+### Nghiệp vụ chính (6 khối)
+- A. Học viên, B. Giáo viên, C. Lớp học/khóa học
+- D. Vận hành, E. Tài chính, F. Lịch khai giảng/phòng học
+
+### DB schema (~17 bảng đã phác thảo)
+- Master data: users, roles, courses, class_templates, timeslots, classrooms, schedule_lines
+- Transaction: classes, class_sessions, enrollments, attendance, invoices, payments, holidays
+
+### Logic scheduling lõi
+- Khái niệm "schedule_line" = (classroom + timeslot) là đơn vị vận hành
+- 3 công thức cốt lõi: expected_end_date, resource_release_date, next_opening_available_date
+- Thuật toán: generate session_date theo weekdays_pattern, tính ngày kết thúc chính xác
+
+### Chưa có trong file
+- Sơ đồ Mermaid/ERD trực quan
+- Quyết định tech stack
+- Thiết kế API
+- UI/UX wireframes
+- Tích hợp AI chat
+
+## Lộ trình 4 bước (theo thứ tự)
+
+User muốn làm tuần tự:
+1. **[Bước 1 - HIỆN TẠI]** Chi tiết DB schema — kiểu dữ liệu, indexes, constraints, migration SQL
+2. **[Bước 2]** Sơ đồ ERD & Mermaid — quan hệ giữa các bảng, cardinality
+3. **[Bước 3]** Thiết kế UI/UX — màn hình chính, luồng theo role, wireframe text
+4. **[Bước 4]** Tích hợp AI Chat — gợi ý lịch khai giảng, hỏi đáp dữ liệu, nhắc lịch tự động
+
+---
+
+## Kế hoạch Bước 1: Chi tiết DB schema
+
+### Mục tiêu
+Hoàn thiện toàn bộ 17 bảng với:
+- Tên cột + kiểu dữ liệu chính xác (VARCHAR(n), INT, BIGINT, TINYINT, ENUM, TEXT, DATE, TIME, DATETIME, DECIMAL)
+- PRIMARY KEY, FOREIGN KEY
+- UNIQUE, NOT NULL, DEFAULT
+- Index gợi ý cho các query thường dùng
+
+### Bảng cần hoàn thiện (nhóm)
+
+**Nhóm người dùng:**
+- `roles` — id, name, description
+- `users` — id, role_id, username, password_hash, full_name, phone, email, status, created_at
+
+**Nhóm nhân sự:**
+- `students` — ~15 fields đã phác thảo
+- `teachers` — ~10 fields đã phác thảo
+- `staff` — ~8 fields đã phác thảo
+
+**Nhóm master data học thuật:**
+- `courses` — id, course_code, course_name, level, total_sessions, session_duration_minutes, tuition_fee, status
+- `class_templates` — id, course_id, template_code, sessions_per_week, total_sessions, default_timeslot_id, default_capacity
+- `timeslots` — id, timeslot_code, label, weekdays_pattern (JSON), start_time, end_time, sessions_per_week, status
+- `classrooms` — id, room_code, room_name, branch_id, capacity, room_type, status
+
+**Nhóm scheduling:**
+- `schedule_lines` — id, line_code, classroom_id, timeslot_id, course_id (nullable), active
+- `classes` — id, line_id, class_code, course_id, template_id, teacher_id, start_date, expected_end_date, resource_release_date, next_opening_available_date, total_sessions, sessions_completed, capacity, status
+- `class_sessions` — id, class_id, session_no, session_date, start_time, end_time, teacher_id, classroom_id, status
+- `holidays` — id, holiday_date, holiday_name, is_active
+
+**Nhóm transaction:**
+- `enrollments` — id, student_id, class_id, enrolled_at, status, tuition_fee, discount_amount, final_fee, payment_status
+- `attendance` — id, class_session_id, student_id, status, note
+- `invoices` — id, invoice_code, student_id, enrollment_id, amount, due_date, status
+- `payments` — id, invoice_id, amount, payment_method, paid_at, note
+
+### Output
+Viết chi tiết vào file mới: `brainstorm ideas/DbSchema.md`

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sqlite3 --version)",
+      "Bash(mkdir -p /Users/macbook/Desktop/abest_hrm_system/database)",
+      "Bash(sqlite3 hrm.db)",
+      "Bash(sqlite3 hrm.db \".tables\")",
+      "Bash(sqlite3 hrm.db \"SELECT COUNT\\(*\\) || ' tables' FROM sqlite_master WHERE type='table';\")",
+      "Bash(sqlite3 hrm.db \"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;\")",
+      "Bash(sqlite3 /Users/macbook/Desktop/abest_hrm_system/database/hrm.db ' *)",
+      "Bash(npm --version)",
+      "Bash(mysql -u root -pHieu761321 -e \"SELECT VERSION\\(\\); SHOW DATABASES;\")",
+      "Bash(brew list *)",
+      "Bash(npm i *)"
+    ]
+  }
+}

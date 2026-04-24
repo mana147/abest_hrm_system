@@ -1,3 +1,9 @@
+# HRM System
+*.db
+*.db-shm
+*.db-wal
+.DS_Store
+
 # Logs
 logs
 *.log

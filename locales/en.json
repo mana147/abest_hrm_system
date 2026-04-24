@@ -1,0 +1,108 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "actions": "Actions",
+    "status": "Status",
+    "note": "Note",
+    "created_at": "Created At",
+    "confirm_delete": "Are you sure you want to delete?",
+    "yes": "Yes",
+    "no": "No",
+    "active": "Active",
+    "inactive": "Inactive",
+    "back": "Back",
+    "add_new": "Add New",
+    "list": "List",
+    "total": "Total",
+    "no_data": "No data available"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "students": "Students",
+    "teachers": "Teachers",
+    "staff": "Staff",
+    "classes": "Classes",
+    "schedule": "Schedule",
+    "finance": "Finance",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "username": "Username",
+    "password": "Password",
+    "login_btn": "Sign In",
+    "invalid_credentials": "Invalid username or password",
+    "account_inactive": "Account is not active",
+    "please_login": "Please login to continue"
+  },
+  "dashboard": {
+    "title": "System Overview",
+    "total_students": "Active Students",
+    "total_classes": "Open Classes",
+    "total_teachers": "Teachers",
+    "revenue_month": "Monthly Revenue",
+    "welcome": "Welcome back"
+  },
+  "students": {
+    "title": "Student Management",
+    "add": "Add Student",
+    "name": "Full Name",
+    "code": "Student Code",
+    "phone": "Phone",
+    "email": "Email",
+    "dob": "Date of Birth",
+    "gender": "Gender",
+    "level": "Level",
+    "source": "Source",
+    "parent": "Parent Name",
+    "parent_phone": "Parent Phone",
+    "status": "Status",
+    "note": "Note"
+  },
+  "teachers": {
+    "title": "Teacher Management",
+    "add": "Add Teacher",
+    "code": "Teacher Code",
+    "name": "Full Name",
+    "specialty": "Specialty",
+    "type": "Contract Type",
+    "hourly_rate": "Hourly Rate",
+    "status": "Status"
+  },
+  "classes": {
+    "title": "Class Management",
+    "add": "Add Class",
+    "code": "Class Code",
+    "name": "Class Name",
+    "course": "Course",
+    "teacher": "Teacher",
+    "classroom": "Classroom",
+    "timeslot": "Timeslot",
+    "start_date": "Start Date",
+    "end_date": "Expected End Date",
+    "next_open": "Next Opening Date",
+    "status": "Status",
+    "capacity": "Capacity",
+    "enrolled": "Enrolled"
+  },
+  "schedule": {
+    "title": "Class Schedule",
+    "lines": "Schedule Lines",
+    "next_available": "Next Available"
+  },
+  "finance": {
+    "title": "Finance",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "payroll": "Teacher Payroll",
+    "amount": "Amount",
+    "due_date": "Due Date",
+    "paid_at": "Paid At",
+    "method": "Method"
+  }
+}
