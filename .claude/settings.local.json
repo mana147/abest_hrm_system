@@ -21,7 +21,17 @@
       "Bash(node --check src/models/timeslotModel.js)",
       "Bash(node --check src/models/classroomModel.js)",
       "Bash(node --check src/controllers/courseController.js)",
-      "Bash(node --check src/controllers/timeslotController.js)"
+      "Bash(node --check src/controllers/timeslotController.js)",
+      "Bash(node --check src/models/scheduleLineModel.js)",
+      "Bash(node --check src/controllers/scheduleLineController.js)",
+      "Bash(node --check src/routes/schedule-lines.js)",
+      "Bash(node --check src/routes/index.js)",
+      "Bash(node -e ' *)",
+      "Bash(node --check src/utils/scheduling.js)",
+      "Bash(node --check src/models/classModel.js)",
+      "Bash(node --check src/controllers/classController.js)",
+      "Bash(node --check src/routes/classes.js)",
+      "Bash(node -e \"require\\('./locales/vi.json'\\); require\\('./locales/en.json'\\); console.log\\('JSON OK'\\)\")"
     ]
   }
 }

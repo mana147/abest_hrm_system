@@ -28,6 +28,7 @@
     "courses": "Courses",
     "timeslots": "Timeslots",
     "classrooms": "Classrooms",
+    "schedule_lines": "Schedule Lines",
     "classes": "Classes",
     "schedule": "Schedule",
     "finance": "Finance",
@@ -84,6 +85,15 @@
     "updated": "Updated successfully",
     "deactivated": "Teacher deactivated"
   },
+  "schedule_lines": {
+    "title": "Schedule Lines",
+    "add": "Add Schedule Line",
+    "code": "Line Code",
+    "name": "Line Name",
+    "created": "Schedule line created successfully",
+    "updated": "Updated successfully",
+    "deactivated": "Schedule line closed"
+  },
   "courses": {
     "title": "Course Management",
     "add": "Add Course",
@@ -136,7 +146,13 @@
     "next_open": "Next Opening Date",
     "status": "Status",
     "capacity": "Capacity",
-    "enrolled": "Enrolled"
+    "enrolled": "Enrolled",
+    "total_sessions": "Total Sessions",
+    "created": "Class created successfully",
+    "updated": "Updated successfully",
+    "cancelled": "Class cancelled",
+    "status_updated": "Class status updated",
+    "session_updated": "Session updated"
   },
   "schedule": {
     "title": "Class Schedule",

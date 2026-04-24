@@ -1,0 +1,235 @@
+<%
+const DAY_LABELS = { '0':'CN','1':'T2','2':'T3','3':'T4','4':'T5','5':'T6','6':'T7' };
+const DAY_LABELS_EN = { '0':'Sun','1':'Mon','2':'Tue','3':'Wed','4':'Thu','5':'Fri','6':'Sat' };
+function showWeekdays(pattern) {
+  if (!pattern) return '—';
+  const map = lang==='vi' ? DAY_LABELS : DAY_LABELS_EN;
+  return pattern.split(',').map(d => map[d] || d).join(' – ');
+}
+const CLASS_STATUS = {
+  planned:         { cls: 'badge-planned',  lbl: lang==='vi' ? 'Dự kiến'     : 'Planned' },
+  open_enrollment: { cls: 'badge-active',   lbl: lang==='vi' ? 'Mở ghi danh' : 'Enrolling' },
+  ongoing:         { cls: 'badge-ongoing',  lbl: lang==='vi' ? 'Đang học'    : 'Ongoing' },
+  completed:       { cls: 'badge-completed',lbl: lang==='vi' ? 'Đã kết thúc' : 'Completed' },
+  cancelled:       { cls: 'badge-cancelled',lbl: lang==='vi' ? 'Đã hủy'      : 'Cancelled' },
+};
+%>
+
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/schedule-lines" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-layout-three-columns me-1"></i><%= t('schedule_lines.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)"><%= line.line_name %></span>
+</nav>
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+  <div class="d-flex align-items-center gap-3">
+    <div style="
+      width:56px;height:56px;border-radius:12px;background:var(--rausch);
+      display:flex;align-items:center;justify-content:center;
+      font-size:22px;color:#fff;flex-shrink:0">
+      <i class="bi bi-layout-three-columns"></i>
+    </div>
+    <div>
+      <h5 class="mb-0 fw-bold" style="font-size:18px"><%= line.line_name %></h5>
+      <div style="font-size:13px;color:var(--ash)">
+        <code><%= line.line_code %></code>
+        &nbsp;·&nbsp;
+        <% if (!line.active) { %>
+          <span class="badge badge-inactive" style="padding:3px 10px"><%= lang==='vi' ? 'Đã đóng' : 'Closed' %></span>
+        <% } else if (activeClass) { %>
+          <span class="badge badge-ongoing" style="padding:3px 10px">
+            <i class="bi bi-circle-fill me-1" style="font-size:7px"></i>
+            <%= lang==='vi' ? 'Đang có lớp' : 'In use' %>
+          </span>
+        <% } else { %>
+          <span class="badge badge-active" style="padding:3px 10px"><%= lang==='vi' ? 'Trống' : 'Available' %></span>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="/schedule-lines/<%= line.id %>/edit" class="btn btn-primary">
+      <i class="bi bi-pencil me-2"></i><%= t('common.edit') %>
+    </a>
+    <a href="/schedule-lines" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i><%= t('common.back') %>
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+
+  <!-- LEFT -->
+  <div class="col-lg-8">
+
+    <!-- Line info -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-layout-three-columns me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Thông tin đường vận hành' : 'Schedule line details' %>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-borderless mb-0">
+          <% const infoRows = [
+            [t('schedule_lines.code'),    line.line_code],
+            [t('schedule_lines.name'),    line.line_name],
+            [lang==='vi' ? 'Phòng học'   : 'Classroom',  `[${line.room_code}] ${line.room_name}`],
+            [lang==='vi' ? 'Khung giờ'   : 'Timeslot',   line.timeslot_label],
+            [lang==='vi' ? 'Lịch học'    : 'Schedule',   showWeekdays(line.weekdays_pattern)],
+            [lang==='vi' ? 'Giờ học'     : 'Time',       `${line.start_time} – ${line.end_time}`],
+            [lang==='vi' ? 'Sĩ số mặc định' : 'Default capacity', line.default_capacity + (lang==='vi' ? ' học viên' : ' students')],
+          ]; %>
+          <% if (line.course_name) infoRows.push([lang==='vi' ? 'Khóa học cố định' : 'Fixed course', `[${line.course_code}] ${line.course_name}`]); %>
+          <% if (line.branch_name) infoRows.push([lang==='vi' ? 'Chi nhánh' : 'Branch', line.branch_name]); %>
+          <% infoRows.forEach(([label, value]) => { %>
+          <tr style="border-bottom:1px solid var(--hairline)">
+            <td style="width:200px;padding:12px 20px;font-size:13px;color:var(--ash);font-weight:500">
+              <%= label %>
+            </td>
+            <td style="padding:12px 20px;font-size:14px;color:var(--ink);font-weight:500">
+              <%= value %>
+            </td>
+          </tr>
+          <% }) %>
+        </table>
+      </div>
+    </div>
+
+    <!-- Active class card -->
+    <% if (activeClass) { %>
+    <%
+      const cls = CLASS_STATUS[activeClass.status] || { cls:'badge-ongoing', lbl: activeClass.status };
+    %>
+    <div class="card mb-4" style="border-color:var(--rausch)">
+      <div class="card-header" style="background:rgba(255,56,92,0.05);border-bottom-color:var(--rausch)">
+        <i class="bi bi-book me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Lớp đang chạy trên line này' : 'Active class on this line' %>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="fw-bold" style="font-size:16px">
+              <a href="/classes/<%= activeClass.id %>" class="text-decoration-none" style="color:var(--ink)">
+                <%= activeClass.class_name %>
+              </a>
+            </div>
+            <code style="font-size:12px;color:var(--ash)"><%= activeClass.class_code %></code>
+            &nbsp;·&nbsp;
+            <span class="badge <%= cls.cls %>" style="padding:3px 9px;font-size:11px"><%= cls.lbl %></span>
+          </div>
+          <a href="/classes/<%= activeClass.id %>" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-right me-1"></i><%= lang==='vi' ? 'Xem lớp' : 'View class' %>
+          </a>
+        </div>
+        <div class="mt-3 d-flex gap-4" style="font-size:13px;color:var(--ash)">
+          <div>
+            <i class="bi bi-calendar-event me-1"></i>
+            <%= lang==='vi' ? 'Khai giảng:' : 'Started:' %>
+            <strong style="color:var(--ink)">
+              <%= new Date(activeClass.start_date).toLocaleDateString(lang==='vi' ? 'vi-VN' : 'en-GB') %>
+            </strong>
+          </div>
+          <% if (activeClass.expected_end_date) { %>
+          <div>
+            <i class="bi bi-calendar-check me-1"></i>
+            <%= lang==='vi' ? 'Kết thúc DK:' : 'Est. end:' %>
+            <strong style="color:var(--ink)">
+              <%= new Date(activeClass.expected_end_date).toLocaleDateString(lang==='vi' ? 'vi-VN' : 'en-GB') %>
+            </strong>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Next opening date card (when line is free) -->
+    <% if (line.active && !activeClass) { %>
+    <div class="card mb-4" style="border-color:#28a745">
+      <div class="card-header" style="background:rgba(40,167,69,0.05);border-bottom-color:#28a745">
+        <i class="bi bi-calendar-plus me-2" style="color:#28a745"></i>
+        <%= lang==='vi' ? 'Line đang trống — sẵn sàng mở lớp mới' : 'Line available — ready for new class' %>
+      </div>
+      <div class="card-body">
+        <a href="/classes/new?line_id=<%= line.id %>" class="btn btn-success">
+          <i class="bi bi-plus-circle me-2"></i>
+          <%= lang==='vi' ? 'Tạo lớp khai giảng mới' : 'Create new class' %>
+        </a>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Note -->
+    <% if (line.note) { %>
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-journal me-2" style="color:var(--rausch)"></i>
+        <%= t('common.note') %>
+      </div>
+      <div class="card-body">
+        <p class="mb-0" style="font-size:14px;color:var(--ink);white-space:pre-line;line-height:1.6">
+          <%= line.note %>
+        </p>
+      </div>
+    </div>
+    <% } %>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-clock-history me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Hệ thống' : 'System' %>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-borderless mb-0">
+          <tr style="border-bottom:1px solid var(--hairline)">
+            <td style="padding:12px 16px;font-size:12px;color:var(--ash)">
+              <%= lang==='vi' ? 'Mã line' : 'Line code' %>
+            </td>
+            <td style="padding:12px 16px">
+              <code style="font-size:13px"><%= line.line_code %></code>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:12px 16px;font-size:12px;color:var(--ash)">
+              <%= lang==='vi' ? 'Trạng thái' : 'Status' %>
+            </td>
+            <td style="padding:12px 16px;font-size:13px;color:var(--ink)">
+              <%= line.active ? (lang==='vi' ? 'Đang hoạt động' : 'Active') : (lang==='vi' ? 'Đã đóng' : 'Closed') %>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-body d-flex flex-column gap-2">
+        <a href="/schedule-lines/<%= line.id %>/edit" class="btn btn-primary w-100">
+          <i class="bi bi-pencil me-2"></i><%= t('common.edit') %>
+        </a>
+        <% if (line.active && !activeClass) { %>
+          <a href="/classes/new?line_id=<%= line.id %>" class="btn btn-success w-100">
+            <i class="bi bi-plus-circle me-2"></i>
+            <%= lang==='vi' ? 'Tạo lớp mới' : 'Create class' %>
+          </a>
+          <hr class="my-1">
+          <form method="POST" action="/schedule-lines/<%= line.id %>/delete"
+                onsubmit="return confirm('<%= lang==='vi' ? 'Đóng đường vận hành này?' : 'Close this line?' %>')">
+            <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+              <i class="bi bi-slash-circle me-2"></i>
+              <%= lang==='vi' ? 'Đóng line' : 'Close line' %>
+            </button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+</div>

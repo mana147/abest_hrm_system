@@ -1,0 +1,274 @@
+<%
+const DAY_VI  = {'0':'CN','1':'T2','2':'T3','3':'T4','4':'T5','5':'T6','6':'T7'};
+const DAY_EN  = {'0':'Sun','1':'Mon','2':'Tue','3':'Wed','4':'Thu','5':'Fri','6':'Sat'};
+function weekdayLabel(dateObj) {
+  const d   = new Date(dateObj);
+  const dow = String(d.getUTCDay());
+  return lang==='vi' ? (DAY_VI[dow] || '?') : (DAY_EN[dow] || '?');
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString(lang==='vi' ? 'vi-VN' : 'en-GB');
+}
+
+const STATUS_MAP = {
+  planned:         { cls:'badge-planned',   lbl: lang==='vi' ? 'Dự kiến'      : 'Planned' },
+  open_enrollment: { cls:'badge-active',    lbl: lang==='vi' ? 'Mở ghi danh'  : 'Enrolling' },
+  ongoing:         { cls:'badge-ongoing',   lbl: lang==='vi' ? 'Đang học'     : 'Ongoing' },
+  completed:       { cls:'badge-completed', lbl: lang==='vi' ? 'Đã kết thúc'  : 'Completed' },
+  cancelled:       { cls:'badge-cancelled', lbl: lang==='vi' ? 'Đã hủy'       : 'Cancelled' },
+  postponed:       { cls:'badge-inactive',  lbl: lang==='vi' ? 'Tạm hoãn'     : 'Postponed' },
+};
+const SESSION_STATUS_MAP = {
+  scheduled:   { cls:'badge-planned',   lbl: lang==='vi' ? 'Chưa học'    : 'Scheduled' },
+  completed:   { cls:'badge-completed', lbl: lang==='vi' ? 'Đã học'      : 'Completed' },
+  cancelled:   { cls:'badge-cancelled', lbl: lang==='vi' ? 'Đã hủy'      : 'Cancelled' },
+  rescheduled: { cls:'badge-ongoing',   lbl: lang==='vi' ? 'Dời lịch'    : 'Rescheduled' },
+};
+
+const clsStatus = STATUS_MAP[cls.status] || { cls:'badge-inactive', lbl: cls.status };
+
+// Status transition labels
+const TRANSITION_LABELS = {
+  open_enrollment: { icon: 'bi-people',          lbl: lang==='vi' ? 'Mở ghi danh'    : 'Open enrollment' },
+  ongoing:         { icon: 'bi-play-fill',        lbl: lang==='vi' ? 'Bắt đầu học'   : 'Start class' },
+  completed:       { icon: 'bi-check-circle',     lbl: lang==='vi' ? 'Hoàn thành'    : 'Complete' },
+  cancelled:       { icon: 'bi-x-circle',         lbl: lang==='vi' ? 'Hủy lớp'       : 'Cancel class' },
+  postponed:       { icon: 'bi-pause-circle',     lbl: lang==='vi' ? 'Tạm hoãn'      : 'Postpone' },
+};
+%>
+
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/classes" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-journal-text me-1"></i><%= t('classes.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)"><%= cls.class_name %></span>
+</nav>
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+  <div class="d-flex align-items-center gap-3">
+    <div style="width:56px;height:56px;border-radius:12px;background:var(--rausch);
+      display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0">
+      <i class="bi bi-journal-text"></i>
+    </div>
+    <div>
+      <h5 class="mb-0 fw-bold" style="font-size:18px"><%= cls.class_name %></h5>
+      <div style="font-size:13px;color:var(--ash)">
+        <code><%= cls.class_code %></code>
+        &nbsp;·&nbsp;
+        <span class="badge <%= clsStatus.cls %>" style="padding:3px 10px"><%= clsStatus.lbl %></span>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/classes/<%= cls.id %>/edit" class="btn btn-primary">
+      <i class="bi bi-pencil me-2"></i><%= t('common.edit') %>
+    </a>
+    <a href="/classes" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i><%= t('common.back') %>
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+
+  <!-- LEFT -->
+  <div class="col-lg-8">
+
+    <!-- Class info -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-journal-text me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Thông tin lớp học' : 'Class information' %>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-borderless mb-0">
+          <% const infoRows = [
+            [t('classes.code'),         cls.class_code],
+            [t('classes.name'),         cls.class_name],
+            [t('classes.course'),       `[${cls.course_code}] ${cls.course_name}`],
+            [t('classes.teacher'),      cls.teacher_name || '—'],
+            [lang==='vi' ? 'Phòng học' : 'Classroom',   `[${cls.room_code}] ${cls.room_name}`],
+            [lang==='vi' ? 'Khung giờ' : 'Timeslot',    cls.timeslot_label],
+            [t('classes.start_date'),   fmtDate(cls.start_date)],
+            [t('classes.end_date'),     cls.expected_end_date ? fmtDate(cls.expected_end_date) : '—'],
+            [t('classes.total_sessions'), `${cls.sessions_completed} / ${cls.total_sessions} ${lang==='vi' ? 'buổi' : 'sessions'}`],
+            [t('classes.capacity'),     `${cls.capacity} ${lang==='vi' ? 'học viên' : 'students'}`],
+          ]; %>
+          <% if (cls.line_code) infoRows.push([lang==='vi' ? 'Đường vận hành' : 'Schedule line', `[${cls.line_code}] ${cls.line_name}`]); %>
+          <% if (cls.next_opening_available_date) infoRows.push([t('classes.next_open'), fmtDate(cls.next_opening_available_date)]); %>
+          <% infoRows.forEach(([label, value]) => { %>
+          <tr style="border-bottom:1px solid var(--hairline)">
+            <td style="width:200px;padding:12px 20px;font-size:13px;color:var(--ash);font-weight:500"><%= label %></td>
+            <td style="padding:12px 20px;font-size:14px;color:var(--ink)"><%= value %></td>
+          </tr>
+          <% }) %>
+        </table>
+      </div>
+    </div>
+
+    <% if (cls.note) { %>
+    <div class="card mb-4">
+      <div class="card-header"><i class="bi bi-journal me-2" style="color:var(--rausch)"></i><%= t('common.note') %></div>
+      <div class="card-body">
+        <p class="mb-0" style="font-size:14px;color:var(--ink);white-space:pre-line;line-height:1.6"><%= cls.note %></p>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Sessions table -->
+    <div class="card" id="sessions">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-list-ol me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Danh sách buổi học' : 'Class sessions' %>
+          <span class="badge bg-secondary ms-2"><%= sessions.length %></span>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <% if (sessions.length === 0) { %>
+          <div class="text-center py-4 text-muted"><%= lang==='vi' ? 'Chưa có buổi học nào' : 'No sessions yet' %></div>
+        <% } else { %>
+        <table class="table mb-0" style="font-size:13px">
+          <thead>
+            <tr>
+              <th style="width:50px">#</th>
+              <th><%= lang==='vi' ? 'Ngày học' : 'Date' %></th>
+              <th><%= lang==='vi' ? 'Thứ' : 'Day' %></th>
+              <th><%= lang==='vi' ? 'Giờ' : 'Time' %></th>
+              <th><%= lang==='vi' ? 'Giáo viên' : 'Teacher' %></th>
+              <th><%= t('common.status') %></th>
+              <th style="width:160px"><%= t('common.actions') %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sessions.forEach(s => {
+              const sb = SESSION_STATUS_MAP[s.status] || { cls:'badge-inactive', lbl: s.status };
+              const isEditable = !['completed','cancelled'].includes(cls.status);
+            %>
+            <tr style="<%= s.status==='cancelled' ? 'opacity:0.5' : '' %>">
+              <td class="fw-semibold" style="color:var(--ash)"><%= s.session_no %></td>
+              <td class="fw-semibold" style="color:var(--ink)">
+                <%= new Date(s.session_date).toLocaleDateString(lang==='vi' ? 'vi-VN' : 'en-GB') %>
+              </td>
+              <td style="color:var(--rausch);font-weight:600"><%= weekdayLabel(s.session_date) %></td>
+              <td style="color:var(--ash)"><%= s.start_time %> – <%= s.end_time %></td>
+              <td style="color:var(--ash)"><%= s.teacher_name || '—' %></td>
+              <td><span class="badge <%= sb.cls %>" style="padding:3px 9px"><%= sb.lbl %></span></td>
+              <td>
+                <% if (isEditable) { %>
+                <form method="POST" action="/classes/<%= cls.id %>/sessions/<%= s.id %>"
+                      class="d-flex gap-1">
+                  <select name="status" class="form-select form-select-sm" style="font-size:12px;width:110px">
+                    <option value="scheduled"   <%= s.status==='scheduled'   ? 'selected' : '' %>><%= lang==='vi' ? 'Chưa học'  : 'Scheduled' %></option>
+                    <option value="completed"   <%= s.status==='completed'   ? 'selected' : '' %>><%= lang==='vi' ? 'Đã học'    : 'Completed' %></option>
+                    <option value="cancelled"   <%= s.status==='cancelled'   ? 'selected' : '' %>><%= lang==='vi' ? 'Đã hủy'    : 'Cancelled' %></option>
+                    <option value="rescheduled" <%= s.status==='rescheduled' ? 'selected' : '' %>><%= lang==='vi' ? 'Dời lịch'  : 'Rescheduled' %></option>
+                  </select>
+                  <button type="submit" class="btn btn-sm btn-outline-secondary" style="padding:2px 8px;font-size:12px">
+                    <i class="bi bi-check2"></i>
+                  </button>
+                </form>
+                <% } else { %>
+                <span style="color:var(--ash);font-size:12px">—</span>
+                <% } %>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="col-lg-4">
+
+    <!-- Status transitions -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <i class="bi bi-arrow-repeat me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Chuyển trạng thái' : 'Status actions' %>
+      </div>
+      <div class="card-body d-flex flex-column gap-2">
+        <% if (validNextStatuses.length === 0) { %>
+          <p class="text-muted mb-0" style="font-size:13px">
+            <%= lang==='vi' ? 'Không có thao tác chuyển trạng thái khả dụng.' : 'No status transitions available.' %>
+          </p>
+        <% } %>
+        <% validNextStatuses.forEach(ns => {
+          const tinfo = TRANSITION_LABELS[ns] || { icon:'bi-arrow-right', lbl: ns };
+          const isDanger = ns === 'cancelled';
+          const btnCls = isDanger ? 'btn-outline-danger' : (ns === 'completed' ? 'btn-success' : 'btn-outline-primary');
+        %>
+        <form method="POST" action="/classes/<%= cls.id %>/status"
+              onsubmit="return confirm('<%= lang==='vi' ? `Xác nhận: ${tinfo.lbl}?` : `Confirm: ${tinfo.lbl}?` %>')">
+          <input type="hidden" name="newStatus" value="<%= ns %>">
+          <button type="submit" class="btn <%= btnCls %> w-100">
+            <i class="bi <%= tinfo.icon %> me-2"></i><%= tinfo.lbl %>
+          </button>
+        </form>
+        <% }) %>
+
+        <% if (!['completed','cancelled'].includes(cls.status)) { %>
+          <hr class="my-1">
+          <form method="POST" action="/classes/<%= cls.id %>/delete"
+                onsubmit="return confirm('<%= lang==='vi' ? 'Hủy lớp học này?' : 'Cancel this class?' %>')">
+            <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+              <i class="bi bi-x-circle me-2"></i><%= lang==='vi' ? 'Hủy lớp' : 'Cancel class' %>
+            </button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- System info -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <i class="bi bi-clock-history me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Hệ thống' : 'System' %>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-borderless mb-0">
+          <tr style="border-bottom:1px solid var(--hairline)">
+            <td style="padding:10px 16px;font-size:12px;color:var(--ash)"><%= lang==='vi' ? 'Ngày tạo' : 'Created' %></td>
+            <td style="padding:10px 16px;font-size:13px;color:var(--ink)"><%= new Date(cls.created_at).toLocaleString(lang==='vi' ? 'vi-VN' : 'en-GB') %></td>
+          </tr>
+          <% if (cls.resource_release_date) { %>
+          <tr style="border-bottom:1px solid var(--hairline)">
+            <td style="padding:10px 16px;font-size:12px;color:var(--ash)"><%= lang==='vi' ? 'Giải phóng line' : 'Release date' %></td>
+            <td style="padding:10px 16px;font-size:13px;color:var(--ink)"><%= fmtDate(cls.resource_release_date) %></td>
+          </tr>
+          <% } %>
+          <% if (cls.next_opening_available_date) { %>
+          <tr>
+            <td style="padding:10px 16px;font-size:12px;color:var(--ash)"><%= t('classes.next_open') %></td>
+            <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#28a745"><%= fmtDate(cls.next_opening_available_date) %></td>
+          </tr>
+          <% } %>
+        </table>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="card">
+      <div class="card-body d-flex flex-column gap-2">
+        <a href="/classes/<%= cls.id %>/edit" class="btn btn-primary w-100">
+          <i class="bi bi-pencil me-2"></i><%= t('common.edit') %>
+        </a>
+        <% if (cls.line_id) { %>
+        <a href="/schedule-lines/<%= cls.line_id %>" class="btn btn-outline-secondary w-100">
+          <i class="bi bi-layout-three-columns me-2"></i>
+          <%= lang==='vi' ? 'Xem đường vận hành' : 'View schedule line' %>
+        </a>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+</div>

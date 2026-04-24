@@ -28,6 +28,7 @@
     "courses": "Khóa học",
     "timeslots": "Khung giờ",
     "classrooms": "Phòng học",
+    "schedule_lines": "Đường vận hành",
     "classes": "Lớp học",
     "schedule": "Lịch khai giảng",
     "finance": "Tài chính",
@@ -84,6 +85,15 @@
     "updated": "Cập nhật thành công",
     "deactivated": "Đã ngừng hoạt động giáo viên"
   },
+  "schedule_lines": {
+    "title": "Đường vận hành",
+    "add": "Thêm đường vận hành",
+    "code": "Mã line",
+    "name": "Tên đường vận hành",
+    "created": "Đã tạo đường vận hành thành công",
+    "updated": "Cập nhật thành công",
+    "deactivated": "Đã đóng đường vận hành"
+  },
   "courses": {
     "title": "Quản lý khóa học",
     "add": "Thêm khóa học",
@@ -124,7 +134,7 @@
   },
   "classes": {
     "title": "Quản lý lớp học",
-    "add": "Thêm lớp",
+    "add": "Thêm lớp học",
     "code": "Mã lớp",
     "name": "Tên lớp",
     "course": "Khóa học",
@@ -136,7 +146,13 @@
     "next_open": "Khai giảng tiếp theo",
     "status": "Trạng thái",
     "capacity": "Sĩ số",
-    "enrolled": "Đã ghi danh"
+    "enrolled": "Đã ghi danh",
+    "total_sessions": "Tổng số buổi",
+    "created": "Đã tạo lớp học thành công",
+    "updated": "Cập nhật thành công",
+    "cancelled": "Đã hủy lớp học",
+    "status_updated": "Đã cập nhật trạng thái lớp",
+    "session_updated": "Đã cập nhật buổi học"
   },
   "schedule": {
     "title": "Lịch khai giảng",

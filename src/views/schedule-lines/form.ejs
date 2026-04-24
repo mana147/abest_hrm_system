@@ -1,0 +1,215 @@
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/schedule-lines" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-layout-three-columns me-1"></i><%= t('schedule_lines.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)">
+    <%= line ? t('common.edit') : t('schedule_lines.add') %>
+  </span>
+</nav>
+
+<div class="page-header">
+  <div class="page-title">
+    <%= line ? t('common.edit') + ' — ' + line.line_name : t('schedule_lines.add') %>
+  </div>
+  <% if (line) { %>
+    <div class="page-sub">
+      <%= lang==='vi' ? 'Mã' : 'Code' %>:
+      <code style="font-size:13px"><%= line.line_code %></code>
+    </div>
+  <% } %>
+</div>
+
+<form method="POST" action="<%= action %>" novalidate>
+  <div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-8">
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-layout-three-columns me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Thông tin đường vận hành' : 'Schedule line information' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('schedule_lines.code') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="line_code" class="form-control"
+                     value="<%= line?.line_code || '' %>"
+                     placeholder="LINE01"
+                     required autofocus>
+            </div>
+
+            <div class="col-md-8">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('schedule_lines.name') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="line_name" class="form-control"
+                     value="<%= line?.line_name || '' %>"
+                     placeholder="<%= lang==='vi' ? 'TOEIC tối T246 - P101' : 'TOEIC Evening Mon/Wed/Fri - P101' %>"
+                     required>
+            </div>
+
+            <!-- Room + Timeslot -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Phòng học' : 'Classroom' %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <select name="classroom_id" class="form-select" required>
+                <option value="">— <%= lang==='vi' ? 'Chọn phòng' : 'Select room' %></option>
+                <% classrooms.forEach(cl => { %>
+                  <option value="<%= cl.id %>"
+                    <%= String(line?.classroom_id) === String(cl.id) ? 'selected' : '' %>>
+                    [<%= cl.room_code %>] <%= cl.room_name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Khung giờ' : 'Timeslot' %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <select name="timeslot_id" class="form-select" required>
+                <option value="">— <%= lang==='vi' ? 'Chọn khung giờ' : 'Select timeslot' %></option>
+                <% timeslots.forEach(ts => { %>
+                  <option value="<%= ts.id %>"
+                    <%= String(line?.timeslot_id) === String(ts.id) ? 'selected' : '' %>>
+                    [<%= ts.timeslot_code %>] <%= ts.label %>
+                  </option>
+                <% }) %>
+              </select>
+              <div class="form-text" style="color:var(--rausch)">
+                <i class="bi bi-exclamation-circle me-1"></i>
+                <%= lang==='vi'
+                  ? 'Mỗi cặp phòng + khung giờ chỉ được dùng cho 1 đường vận hành'
+                  : 'Each room + timeslot pair can only belong to one schedule line' %>
+              </div>
+            </div>
+
+            <!-- Capacity -->
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Sĩ số mặc định' : 'Default capacity' %>
+              </label>
+              <div class="input-group">
+                <input type="number" name="default_capacity" class="form-control"
+                       value="<%= line?.default_capacity || 15 %>"
+                       min="1">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <%= lang==='vi' ? 'học viên' : 'students' %>
+                </span>
+              </div>
+            </div>
+
+            <!-- Course (optional) -->
+            <div class="col-md-8">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Khóa học cố định (tùy chọn)' : 'Fixed course (optional)' %>
+              </label>
+              <select name="course_id" class="form-select">
+                <option value="">— <%= lang==='vi' ? 'Linh hoạt (nhiều khóa)' : 'Flexible (multiple courses)' %></option>
+                <% courses.forEach(co => { %>
+                  <option value="<%= co.id %>"
+                    <%= String(line?.course_id) === String(co.id) ? 'selected' : '' %>>
+                    [<%= co.course_code %>] <%= co.course_name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <!-- Branch (optional) -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Chi nhánh (tùy chọn)' : 'Branch (optional)' %>
+              </label>
+              <select name="branch_id" class="form-select">
+                <option value="">—</option>
+                <% branches.forEach(br => { %>
+                  <option value="<%= br.id %>"
+                    <%= String(line?.branch_id) === String(br.id) ? 'selected' : '' %>>
+                    <%= br.branch_name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-journal me-2" style="color:var(--rausch)"></i>
+          <%= t('common.note') %>
+        </div>
+        <div class="card-body">
+          <textarea name="note" class="form-control" rows="3"
+                    placeholder="<%= lang==='vi' ? 'Ghi chú thêm về đường vận hành...' : 'Additional notes...' %>"
+                    style="resize:vertical"><%= line?.note || '' %></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-4">
+
+      <!-- Active status -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-sliders me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Trạng thái' : 'Status' %>
+        </div>
+        <div class="card-body">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" name="active" value="1"
+                   id="activeSwitch"
+                   <%= (!line || line.active) ? 'checked' : '' %>>
+            <label class="form-check-label fw-semibold" for="activeSwitch">
+              <%= lang==='vi' ? 'Đường vận hành đang hoạt động' : 'Schedule line is active' %>
+            </label>
+          </div>
+          <input type="hidden" name="active" value="0">
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-body d-flex flex-column gap-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check2 me-2"></i><%= t('common.save') %>
+          </button>
+          <a href="<%= line ? '/schedule-lines/' + line.id : '/schedule-lines' %>"
+             class="btn btn-outline-secondary w-100">
+            <i class="bi bi-x me-2"></i><%= t('common.cancel') %>
+          </a>
+          <% if (line && line.active) { %>
+            <hr class="my-1">
+            <form method="POST" action="/schedule-lines/<%= line.id %>/delete"
+                  onsubmit="return confirm('<%= lang==='vi' ? 'Đóng đường vận hành này? Hành động này không thể hoàn tác tự động.' : 'Close this schedule line?' %>')">
+              <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                <i class="bi bi-slash-circle me-2"></i>
+                <%= lang==='vi' ? 'Đóng đường vận hành' : 'Close line' %>
+              </button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+<script>
+// Checkbox switch trick: khi check = value "1", khi uncheck = value "0" từ hidden input
+document.getElementById('activeSwitch').addEventListener('change', function() {
+  this.value = this.checked ? '1' : '0';
+});
+</script>

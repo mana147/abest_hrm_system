@@ -79,8 +79,17 @@ body {
 .btn-outline-secondary { border-color: var(--hairline); color: var(--ink); border-radius: var(--r-sm); font-weight: 500; }
 .btn-outline-secondary:hover { background: var(--soft-cloud); color: var(--ink); border-color: var(--hairline); }
 
-.btn-outline-danger { border-radius: var(--r-full); width: 36px; height: 36px;
-                      padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+.btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+  border-radius: var(--r-sm);
+  font-weight: 500;
+}
+
+.btn-outline-danger:hover {
+  background: #dc3545;
+  color: #fff;
+}
 
 .form-control, .form-select {
   border-color: var(--hairline);

@@ -28,9 +28,13 @@ router.use('/students', require('./students'));
 router.use('/teachers', require('./teachers'));
 
 // Master data
-router.use('/courses',    require('./courses'));
-router.use('/timeslots',  require('./timeslots'));
-router.use('/classrooms', require('./classrooms'));
+router.use('/courses',         require('./courses'));
+router.use('/timeslots',       require('./timeslots'));
+router.use('/classrooms',      require('./classrooms'));
+
+// Scheduling
+router.use('/schedule-lines',  require('./schedule-lines'));
+router.use('/classes',         require('./classes'));
 
 // Landing page (public)
 router.get('/', (req, res) => {

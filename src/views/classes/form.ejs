@@ -1,0 +1,387 @@
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/classes" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-journal-text me-1"></i><%= t('classes.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)"><%= cls ? t('common.edit') : t('classes.add') %></span>
+</nav>
+
+<div class="page-header">
+  <div class="page-title">
+    <%= cls ? t('common.edit') + ' — ' + cls.class_name : t('classes.add') %>
+  </div>
+  <% if (cls) { %>
+    <div class="page-sub"><code style="font-size:13px"><%= cls.class_code %></code></div>
+  <% } %>
+</div>
+
+<!-- Pass data to JS for auto-fill -->
+<script>
+const SCHEDULE_LINES = <%- JSON.stringify(scheduleLines.map(sl => ({
+  id: sl.id, classroom_id: sl.classroom_id, timeslot_id: sl.timeslot_id,
+  default_capacity: sl.default_capacity,
+  room_name: sl.room_name, room_code: sl.room_code,
+  timeslot_label: sl.timeslot_label, weekdays_pattern: sl.weekdays_pattern,
+  start_time: sl.start_time, end_time: sl.end_time,
+}))) %>;
+const COURSES_DATA = <%- JSON.stringify(courses.map(c => ({
+  id: c.id, total_sessions: c.total_sessions, course_name: c.course_name,
+}))) %>;
+const IS_EDIT = <%- JSON.stringify(!!cls) %>;
+</script>
+
+<form method="POST" action="<%= action %>" novalidate id="classForm">
+  <div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-8">
+
+      <!-- Scheduling card (only for create) -->
+      <% if (!cls) { %>
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-layout-three-columns me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Đường vận hành & Lịch học' : 'Schedule Line & Timetable' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <!-- Schedule Line selector -->
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Đường vận hành (tùy chọn)' : 'Schedule line (optional)' %>
+              </label>
+              <select name="line_id" id="lineSelect" class="form-select">
+                <option value="">— <%= lang==='vi' ? 'Chọn để tự điền phòng & khung giờ' : 'Select to auto-fill room & timeslot' %></option>
+                <% scheduleLines.forEach(sl => { %>
+                  <option value="<%= sl.id %>"
+                    data-classroom="<%= sl.classroom_id %>"
+                    data-timeslot="<%= sl.timeslot_id %>"
+                    data-capacity="<%= sl.default_capacity %>"
+                    <%= String(prefill.line_id) === String(sl.id) ? 'selected' : '' %>>
+                    [<%= sl.line_code %>] <%= sl.line_name %> — <%= sl.room_code %> · <%= sl.timeslot_label %>
+                  </option>
+                <% }) %>
+              </select>
+              <!-- Display info when line selected -->
+              <div id="lineInfo" class="mt-2 p-2 rounded" style="background:var(--cloud);font-size:13px;display:none">
+                <i class="bi bi-info-circle me-1 text-muted"></i>
+                <span id="lineInfoText"></span>
+              </div>
+            </div>
+
+            <!-- Classroom -->
+            <div class="col-md-6" id="classroomGroup">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Phòng học' : 'Classroom' %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <select name="classroom_id" id="classroomSelect" class="form-select" required>
+                <option value="">— <%= lang==='vi' ? 'Chọn phòng' : 'Select room' %></option>
+                <% classrooms.forEach(cl => { %>
+                  <option value="<%= cl.id %>"
+                    <%= String(prefill.classroom_id) === String(cl.id) ? 'selected' : '' %>>
+                    [<%= cl.room_code %>] <%= cl.room_name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <!-- Timeslot -->
+            <div class="col-md-6" id="timeslotGroup">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= lang==='vi' ? 'Khung giờ' : 'Timeslot' %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <select name="timeslot_id" id="timeslotSelect" class="form-select" required>
+                <option value="">— <%= lang==='vi' ? 'Chọn khung giờ' : 'Select timeslot' %></option>
+                <% timeslots.forEach(ts => { %>
+                  <option value="<%= ts.id %>"
+                    <%= String(prefill.timeslot_id) === String(ts.id) ? 'selected' : '' %>>
+                    [<%= ts.timeslot_code %>] <%= ts.label %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <!-- Start date -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classes.start_date') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="date" name="start_date" id="startDateInput" class="form-control" required>
+              <div id="startDateHint" class="form-text" style="color:var(--ash)"></div>
+            </div>
+
+            <!-- Total sessions -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classes.total_sessions') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <div class="input-group">
+                <input type="number" name="total_sessions" id="totalSessionsInput" class="form-control"
+                       min="1" required placeholder="24">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <%= lang==='vi' ? 'buổi' : 'sessions' %>
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <% } else { %>
+      <!-- Edit: scheduling fields readonly -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-layout-three-columns me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Thông tin lịch học (chỉ xem)' : 'Schedule info (readonly)' %>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-borderless mb-0">
+            <% const schedRows = [
+              [lang==='vi' ? 'Phòng học'    : 'Classroom',  `[${cls.room_code}] ${cls.room_name}`],
+              [lang==='vi' ? 'Khung giờ'    : 'Timeslot',   cls.timeslot_label],
+              [lang==='vi' ? 'Ngày khai giảng' : 'Start date', new Date(cls.start_date).toLocaleDateString(lang==='vi' ? 'vi-VN' : 'en-GB')],
+              [lang==='vi' ? 'Tổng số buổi' : 'Total sessions', cls.total_sessions + (lang==='vi' ? ' buổi' : ' sessions')],
+              [lang==='vi' ? 'Kết thúc DK'  : 'Est. end', cls.expected_end_date ? new Date(cls.expected_end_date).toLocaleDateString(lang==='vi' ? 'vi-VN' : 'en-GB') : '—'],
+            ]; %>
+            <% schedRows.forEach(([label, value]) => { %>
+            <tr style="border-bottom:1px solid var(--hairline)">
+              <td style="width:180px;padding:10px 20px;font-size:13px;color:var(--ash);font-weight:500"><%= label %></td>
+              <td style="padding:10px 20px;font-size:13px;color:var(--ink)"><%= value %></td>
+            </tr>
+            <% }) %>
+          </table>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Class info card -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-journal-text me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Thông tin lớp học' : 'Class information' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classes.name') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="class_name" id="classNameInput" class="form-control"
+                     value="<%= cls?.class_name || '' %>"
+                     placeholder="<%= lang==='vi' ? 'VD: TOEIC Foundation - K05/2026' : 'e.g. TOEIC Foundation - Batch 05/2026' %>"
+                     required>
+            </div>
+
+            <% if (!cls) { %>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classes.course') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <select name="course_id" id="courseSelect" class="form-select" required>
+                <option value="">— <%= lang==='vi' ? 'Chọn khóa học' : 'Select course' %></option>
+                <% courses.forEach(co => { %>
+                  <option value="<%= co.id %>" data-sessions="<%= co.total_sessions %>" data-name="<%= co.course_name %>">
+                    [<%= co.course_code %>] <%= co.course_name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+            <% } else { %>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px"><%= t('classes.course') %></label>
+              <input type="text" class="form-control" value="[<%= cls.course_code %>] <%= cls.course_name %>" readonly
+                     style="background:var(--cloud)">
+            </div>
+            <% } %>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classes.teacher') %>
+              </label>
+              <select name="teacher_id" class="form-select">
+                <option value="">— <%= lang==='vi' ? 'Chưa phân công' : 'Not assigned' %></option>
+                <% teachers.forEach(t => { %>
+                  <option value="<%= t.id %>"
+                    <%= String(cls?.teacher_id) === String(t.id) ? 'selected' : '' %>>
+                    [<%= t.teacher_code %>] <%= t.full_name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <% if (!cls) { %>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classes.capacity') %>
+              </label>
+              <div class="input-group">
+                <input type="number" name="capacity" id="capacityInput" class="form-control"
+                       value="<%= prefill.capacity || 15 %>" min="1">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <%= lang==='vi' ? 'học viên' : 'students' %>
+                </span>
+              </div>
+            </div>
+            <% } else { %>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px"><%= t('classes.capacity') %></label>
+              <div class="input-group">
+                <input type="number" name="capacity" class="form-control"
+                       value="<%= cls.capacity %>" min="1">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <%= lang==='vi' ? 'học viên' : 'students' %>
+                </span>
+              </div>
+            </div>
+            <% } %>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-journal me-2" style="color:var(--rausch)"></i>
+          <%= t('common.note') %>
+        </div>
+        <div class="card-body">
+          <textarea name="note" class="form-control" rows="3"
+                    placeholder="<%= lang==='vi' ? 'Ghi chú thêm về lớp học...' : 'Additional notes...' %>"
+                    style="resize:vertical"><%= cls?.note || '' %></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-4">
+
+      <!-- Status -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-sliders me-2" style="color:var(--rausch)"></i>
+          <%= t('common.status') %>
+        </div>
+        <div class="card-body">
+          <% if (!cls) { %>
+          <select name="status" class="form-select">
+            <option value="planned"         selected><%= lang==='vi' ? 'Dự kiến' : 'Planned' %></option>
+            <option value="open_enrollment"          ><%= lang==='vi' ? 'Mở ghi danh' : 'Open enrollment' %></option>
+          </select>
+          <% } else { %>
+          <div class="form-text">
+            <%= lang==='vi'
+              ? 'Thay đổi trạng thái lớp qua các nút trên trang chi tiết.'
+              : 'Change class status via action buttons on the detail page.' %>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-body d-flex flex-column gap-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check2 me-2"></i><%= t('common.save') %>
+          </button>
+          <a href="<%= cls ? '/classes/' + cls.id : '/classes' %>"
+             class="btn btn-outline-secondary w-100">
+            <i class="bi bi-x me-2"></i><%= t('common.cancel') %>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+<% if (!cls) { %>
+<script>
+const lineSelect      = document.getElementById('lineSelect');
+const classroomSelect = document.getElementById('classroomSelect');
+const timeslotSelect  = document.getElementById('timeslotSelect');
+const capacityInput   = document.getElementById('capacityInput');
+const courseSelect    = document.getElementById('courseSelect');
+const sessionsInput   = document.getElementById('totalSessionsInput');
+const classNameInput  = document.getElementById('classNameInput');
+const lineInfo        = document.getElementById('lineInfo');
+const lineInfoText    = document.getElementById('lineInfoText');
+const startDateInput  = document.getElementById('startDateInput');
+const startDateHint   = document.getElementById('startDateHint');
+
+const DAY_VI = {0:'CN',1:'T2',2:'T3',3:'T4',4:'T5',5:'T6',6:'T7'};
+
+function applyLine(lineId) {
+  const line = SCHEDULE_LINES.find(sl => String(sl.id) === String(lineId));
+  if (!line) {
+    lineInfo.style.display = 'none';
+    classroomSelect.disabled = false;
+    timeslotSelect.disabled  = false;
+    return;
+  }
+  // Auto-fill classroom and timeslot
+  classroomSelect.value    = line.classroom_id;
+  timeslotSelect.value     = line.timeslot_id;
+  classroomSelect.disabled = true;
+  timeslotSelect.disabled  = true;
+  capacityInput.value      = line.default_capacity;
+
+  // Show line info
+  const pattern = line.weekdays_pattern.split(',').map(d => DAY_VI[d] || d).join('-');
+  lineInfoText.textContent = `[${line.room_code}] ${line.room_name} · ${pattern} ${line.start_time}–${line.end_time}`;
+  lineInfo.style.display = 'block';
+
+  // Update start date hint
+  updateStartDateHint(line.weekdays_pattern);
+}
+
+function updateStartDateHint(pattern) {
+  if (!pattern || !startDateInput.value) { startDateHint.textContent = ''; return; }
+  const days = pattern.split(',').map(Number);
+  const d    = new Date(startDateInput.value);
+  const dow  = d.getUTCDay(); // use UTC because input value is YYYY-MM-DD
+  const labels = days.map(n => DAY_VI[n] || n).join(', ');
+  if (!days.includes(dow)) {
+    startDateHint.textContent = `⚠ Ngày này không thuộc lịch học (${labels}). Vui lòng chọn đúng thứ.`;
+    startDateHint.style.color = 'var(--rausch)';
+  } else {
+    startDateHint.textContent = `✓ Hợp lệ — lịch học: ${labels}`;
+    startDateHint.style.color = '#28a745';
+  }
+}
+
+lineSelect.addEventListener('change', function() {
+  applyLine(this.value);
+});
+
+courseSelect.addEventListener('change', function() {
+  const course = COURSES_DATA.find(c => String(c.id) === String(this.value));
+  if (course) {
+    sessionsInput.value = course.total_sessions;
+    if (!classNameInput.value) classNameInput.value = course.course_name;
+  }
+});
+
+startDateInput.addEventListener('change', function() {
+  const line = SCHEDULE_LINES.find(sl => String(sl.id) === String(lineSelect.value));
+  const timeslot = Array.from(timeslotSelect.options).find(o => o.selected && o.value);
+  // Get pattern from selected line or timeslot
+  let pattern = line ? line.weekdays_pattern : null;
+  updateStartDateHint(pattern);
+});
+
+timeslotSelect.addEventListener('change', function() {
+  startDateInput.dispatchEvent(new Event('change'));
+});
+
+// Init on load if prefill
+window.addEventListener('DOMContentLoaded', function() {
+  const preLineId = '<%= prefill.line_id || "" %>';
+  if (preLineId) applyLine(preLineId);
+});
+</script>
+<% } %>

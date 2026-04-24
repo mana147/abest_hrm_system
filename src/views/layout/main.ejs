@@ -74,6 +74,12 @@
 
       <div class="sidebar-section-label sidebar-label"><%= lang==='vi' ? 'Học thuật' : 'Academic' %></div>
       <li class="nav-item">
+        <a class="nav-link <%= page==='schedule-lines' ? 'active' : '' %>" href="/schedule-lines">
+          <i class="bi bi-layout-three-columns"></i>
+          <span class="sidebar-label"><%= t('nav.schedule_lines') %></span>
+        </a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link <%= page==='classes' ? 'active' : '' %>" href="/classes">
           <i class="bi bi-journal-text"></i>
           <span class="sidebar-label"><%= t('nav.classes') %></span>

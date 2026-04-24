@@ -1,0 +1,195 @@
+<%
+const DAY_LABELS = { '0':'CN','1':'T2','2':'T3','3':'T4','4':'T5','5':'T6','6':'T7' };
+function showWeekdays(pattern) {
+  if (!pattern) return '—';
+  return pattern.split(',').map(d => DAY_LABELS[d] || d).join('-');
+}
+const STATUS_MAP = {
+  planned:         { cls: 'badge-planned',  lbl: lang==='vi' ? 'Dự kiến'     : 'Planned' },
+  open_enrollment: { cls: 'badge-active',   lbl: lang==='vi' ? 'Ghi danh'    : 'Enrolling' },
+  ongoing:         { cls: 'badge-ongoing',  lbl: lang==='vi' ? 'Đang học'    : 'Ongoing' },
+};
+%>
+
+<!-- Page header -->
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div class="page-header mb-0">
+    <div class="page-title"><%= t('schedule_lines.title') %></div>
+    <div class="page-sub"><%= total %> <%= lang==='vi' ? 'đường vận hành' : 'schedule lines' %></div>
+  </div>
+  <a href="/schedule-lines/new" class="btn btn-primary">
+    <i class="bi bi-plus-circle me-2"></i><%= t('schedule_lines.add') %>
+  </a>
+</div>
+
+<!-- Search + Filter bar -->
+<form method="GET" action="/schedule-lines" class="mb-4">
+  <div class="d-flex gap-2 flex-wrap">
+    <div class="input-group" style="max-width:320px">
+      <span class="input-group-text bg-white border-end-0" style="border-color:var(--hairline)">
+        <i class="bi bi-search text-muted"></i>
+      </span>
+      <input type="text" name="search" class="form-control border-start-0 ps-0"
+             style="border-color:var(--hairline)"
+             placeholder="<%= lang==='vi' ? 'Tìm mã, tên đường vận hành...' : 'Search code, name...' %>"
+             value="<%= search %>">
+    </div>
+
+    <select name="active" class="form-select" style="width:auto;min-width:160px"
+            onchange="this.form.submit()">
+      <option value=""><%= lang==='vi' ? 'Tất cả' : 'All' %></option>
+      <option value="1" <%= filterActive==='1' ? 'selected' : '' %>>
+        <%= lang==='vi' ? '✓ Đang hoạt động' : '✓ Active' %>
+      </option>
+      <option value="0" <%= filterActive==='0' ? 'selected' : '' %>>
+        <%= lang==='vi' ? '— Đã đóng' : '— Closed' %>
+      </option>
+    </select>
+
+    <% if (search || filterActive !== '') { %>
+      <a href="/schedule-lines" class="btn btn-outline-secondary">
+        <i class="bi bi-x me-1"></i><%= lang==='vi' ? 'Xóa bộ lọc' : 'Clear' %>
+      </a>
+    <% } %>
+    <button type="submit" class="btn btn-primary">
+      <%= lang==='vi' ? 'Tìm' : 'Search' %>
+    </button>
+  </div>
+</form>
+
+<!-- Table -->
+<div class="card p-0">
+  <% if (rows.length === 0) { %>
+    <div class="text-center py-5">
+      <i class="bi bi-layout-three-columns" style="font-size:40px;color:var(--stone)"></i>
+      <p class="mt-3 text-muted"><%= t('common.no_data') %></p>
+      <a href="/schedule-lines/new" class="btn btn-primary btn-sm mt-1">
+        <i class="bi bi-plus-circle me-1"></i><%= t('schedule_lines.add') %>
+      </a>
+    </div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th><%= t('schedule_lines.code') %></th>
+          <th><%= t('schedule_lines.name') %></th>
+          <th><%= lang==='vi' ? 'Phòng học' : 'Room' %></th>
+          <th><%= lang==='vi' ? 'Khung giờ' : 'Timeslot' %></th>
+          <th><%= lang==='vi' ? 'Trạng thái line' : 'Line Status' %></th>
+          <th><%= lang==='vi' ? 'Lớp đang chạy' : 'Active Class' %></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(sl => {
+          const hasClass = !!sl.active_class_id;
+          const activeClsBadge = hasClass ? (STATUS_MAP[sl.class_status] || { cls:'badge-ongoing', lbl: sl.class_status }) : null;
+        %>
+        <tr>
+          <td>
+            <a href="/schedule-lines/<%= sl.id %>" class="fw-semibold text-decoration-none" style="color:var(--ink)">
+              <code style="font-size:12px"><%= sl.line_code %></code>
+            </a>
+          </td>
+          <td>
+            <a href="/schedule-lines/<%= sl.id %>" class="text-decoration-none fw-semibold" style="color:var(--ink)">
+              <%= sl.line_name %>
+            </a>
+          </td>
+          <td style="color:var(--ash)">
+            <code style="font-size:12px"><%= sl.room_code %></code>
+            <span class="ms-1"><%= sl.room_name %></span>
+          </td>
+          <td>
+            <span class="fw-semibold" style="color:var(--rausch)"><%= showWeekdays(sl.weekdays_pattern) %></span>
+            <span class="ms-1" style="color:var(--ash);font-size:13px"><%= sl.start_time %>–<%= sl.end_time %></span>
+          </td>
+          <td>
+            <% if (!sl.active) { %>
+              <span class="badge badge-inactive" style="padding:4px 10px">
+                <%= lang==='vi' ? 'Đã đóng' : 'Closed' %>
+              </span>
+            <% } else if (hasClass) { %>
+              <span class="badge badge-ongoing" style="padding:4px 10px">
+                <i class="bi bi-circle-fill me-1" style="font-size:7px"></i>
+                <%= lang==='vi' ? 'Đang có lớp' : 'In use' %>
+              </span>
+            <% } else { %>
+              <span class="badge badge-active" style="padding:4px 10px">
+                <%= lang==='vi' ? 'Trống' : 'Available' %>
+              </span>
+            <% } %>
+          </td>
+          <td>
+            <% if (hasClass) { %>
+              <a href="/classes/<%= sl.active_class_id %>" class="text-decoration-none" style="color:var(--ink);font-size:13px">
+                <code style="font-size:12px"><%= sl.class_code %></code>
+                <% if (activeClsBadge) { %>
+                  <span class="badge <%= activeClsBadge.cls %> ms-1" style="padding:2px 7px;font-size:11px">
+                    <%= activeClsBadge.lbl %>
+                  </span>
+                <% } %>
+              </a>
+            <% } else if (sl.next_opening_available_date) { %>
+              <span style="font-size:12px;color:var(--ash)">
+                <i class="bi bi-calendar-check me-1"></i>
+                <%= lang==='vi' ? 'Mở được từ' : 'Available from' %>
+                <strong><%= new Date(sl.next_opening_available_date).toLocaleDateString(lang==='vi' ? 'vi-VN' : 'en-GB') %></strong>
+              </span>
+            <% } else { %>
+              <span style="color:var(--ash);font-size:13px">—</span>
+            <% } %>
+          </td>
+          <td class="text-end">
+            <div class="d-flex justify-content-end gap-1">
+              <a href="/schedule-lines/<%= sl.id %>"
+                 class="btn btn-sm btn-outline-secondary" title="<%= lang==='vi' ? 'Xem' : 'View' %>">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="/schedule-lines/<%= sl.id %>/edit"
+                 class="btn btn-sm btn-outline-secondary" title="<%= t('common.edit') %>">
+                <i class="bi bi-pencil"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<!-- Pagination -->
+<% if (totalPages > 1) { %>
+<nav class="d-flex justify-content-between align-items-center mt-4">
+  <span class="small text-muted">
+    <%= lang==='vi'
+      ? `Trang ${page} / ${totalPages} — ${total} đường vận hành`
+      : `Page ${page} of ${totalPages} — ${total} lines` %>
+  </span>
+  <ul class="pagination pagination-sm mb-0">
+    <li class="page-item <%= page<=1 ? 'disabled' : '' %>">
+      <a class="page-link" href="?page=<%= page-1 %>&search=<%= search %>&active=<%= filterActive %>">
+        <i class="bi bi-chevron-left"></i>
+      </a>
+    </li>
+    <% for(let p=Math.max(1,page-2); p<=Math.min(totalPages,page+2); p++) { %>
+      <li class="page-item <%= p===page ? 'active' : '' %>">
+        <a class="page-link" href="?page=<%= p %>&search=<%= search %>&active=<%= filterActive %>"><%= p %></a>
+      </li>
+    <% } %>
+    <li class="page-item <%= page>=totalPages ? 'disabled' : '' %>">
+      <a class="page-link" href="?page=<%= page+1 %>&search=<%= search %>&active=<%= filterActive %>">
+        <i class="bi bi-chevron-right"></i>
+      </a>
+    </li>
+  </ul>
+</nav>
+<% } %>
+
+<style>
+.page-link { border-color: var(--hairline); color: var(--ink); font-size:13px }
+.page-item.active .page-link { background: var(--rausch); border-color: var(--rausch); }
+</style>
