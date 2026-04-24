@@ -1,0 +1,165 @@
+<%
+const selectedDays = timeslot ? timeslot.weekdays_pattern.split(',') : [];
+const DAY_OPTIONS = [
+  { val:'1', vi:'Thứ 2', en:'Monday' },
+  { val:'2', vi:'Thứ 3', en:'Tuesday' },
+  { val:'3', vi:'Thứ 4', en:'Wednesday' },
+  { val:'4', vi:'Thứ 5', en:'Thursday' },
+  { val:'5', vi:'Thứ 6', en:'Friday' },
+  { val:'6', vi:'Thứ 7', en:'Saturday' },
+  { val:'0', vi:'Chủ nhật', en:'Sunday' },
+];
+%>
+
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/timeslots" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-clock me-1"></i><%= t('timeslots.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)">
+    <%= timeslot ? t('common.edit') : t('timeslots.add') %>
+  </span>
+</nav>
+
+<div class="page-header">
+  <div class="page-title">
+    <%= timeslot ? t('common.edit') + ' — ' + timeslot.label : t('timeslots.add') %>
+  </div>
+  <% if (timeslot) { %>
+    <div class="page-sub">
+      <%= lang==='vi' ? 'Mã khung giờ' : 'Timeslot code' %>:
+      <code style="font-size:13px"><%= timeslot.timeslot_code %></code>
+    </div>
+  <% } %>
+</div>
+
+<form method="POST" action="<%= action %>" novalidate>
+  <div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-8">
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-clock me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Thông tin khung giờ' : 'Timeslot information' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('timeslots.code') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="timeslot_code" class="form-control"
+                     value="<%= timeslot?.timeslot_code || '' %>"
+                     placeholder="TS01"
+                     required autofocus>
+            </div>
+
+            <div class="col-md-8">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('timeslots.label') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="label" class="form-control"
+                     value="<%= timeslot?.label || '' %>"
+                     placeholder="<%= lang==='vi' ? 'T2-T4-T6 18:00-20:00' : 'Mon-Wed-Fri 18:00-20:00' %>"
+                     required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('timeslots.start') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="time" name="start_time" class="form-control"
+                     value="<%= timeslot?.start_time || '' %>"
+                     required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('timeslots.end') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="time" name="end_time" class="form-control"
+                     value="<%= timeslot?.end_time || '' %>"
+                     required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('timeslots.weekdays') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <div class="d-flex flex-wrap gap-2 mt-1">
+                <% DAY_OPTIONS.forEach(d => { %>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox"
+                           name="weekdays" value="<%= d.val %>"
+                           id="day_<%= d.val %>"
+                           <%= selectedDays.includes(d.val) ? 'checked' : '' %>>
+                    <label class="form-check-label fw-semibold" for="day_<%= d.val %>">
+                      <%= lang==='vi' ? d.vi : d.en %>
+                    </label>
+                  </div>
+                <% }) %>
+              </div>
+              <div class="form-text">
+                <%= lang==='vi'
+                  ? 'Số buổi/tuần sẽ tự tính theo số ngày đã chọn'
+                  : 'Sessions per week is auto-calculated from selected days' %>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-4">
+
+      <!-- Status -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-sliders me-2" style="color:var(--rausch)"></i>
+          <%= t('common.status') %>
+        </div>
+        <div class="card-body">
+          <select name="status" class="form-select">
+            <option value="active"   <%= (!timeslot || timeslot.status==='active')   ? 'selected' : '' %>>
+              <%= lang==='vi' ? '✓ Đang dùng' : '✓ Active' %>
+            </option>
+            <option value="inactive" <%= timeslot?.status==='inactive' ? 'selected' : '' %>>
+              <%= lang==='vi' ? '— Ngừng' : '— Inactive' %>
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-body d-flex flex-column gap-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check2 me-2"></i><%= t('common.save') %>
+          </button>
+          <a href="<%= timeslot ? '/timeslots/' + timeslot.id : '/timeslots' %>"
+             class="btn btn-outline-secondary w-100">
+            <i class="bi bi-x me-2"></i><%= t('common.cancel') %>
+          </a>
+          <% if (timeslot && timeslot.status !== 'inactive') { %>
+            <hr class="my-1">
+            <form method="POST" action="/timeslots/<%= timeslot.id %>/delete"
+                  onsubmit="return confirm('<%= lang==='vi' ? 'Ngừng khung giờ này?' : 'Deactivate this timeslot?' %>')">
+              <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                <i class="bi bi-slash-circle me-2"></i>
+                <%= lang==='vi' ? 'Ngừng khung giờ' : 'Deactivate' %>
+              </button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>

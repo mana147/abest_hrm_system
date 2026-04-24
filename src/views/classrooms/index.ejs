@@ -1,0 +1,168 @@
+<!-- Page header -->
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div class="page-header mb-0">
+    <div class="page-title"><%= t('classrooms.title') %></div>
+    <div class="page-sub"><%= total %> <%= lang==='vi' ? 'phòng học' : 'classrooms' %></div>
+  </div>
+  <a href="/classrooms/new" class="btn btn-primary">
+    <i class="bi bi-plus-circle me-2"></i><%= t('classrooms.add') %>
+  </a>
+</div>
+
+<!-- Search + Filter bar -->
+<form method="GET" action="/classrooms" class="mb-4">
+  <div class="d-flex gap-2 flex-wrap">
+    <div class="input-group" style="max-width:320px">
+      <span class="input-group-text bg-white border-end-0" style="border-color:var(--hairline)">
+        <i class="bi bi-search text-muted"></i>
+      </span>
+      <input type="text" name="search" class="form-control border-start-0 ps-0"
+             style="border-color:var(--hairline)"
+             placeholder="<%= lang==='vi' ? 'Tìm tên, mã phòng...' : 'Search name, code...' %>"
+             value="<%= search %>">
+    </div>
+
+    <select name="room_type" class="form-select" style="width:auto;min-width:160px"
+            onchange="this.form.submit()">
+      <option value=""><%= lang==='vi' ? 'Tất cả loại' : 'All types' %></option>
+      <option value="classroom"    <%= filterRoomType==='classroom'    ? 'selected' : '' %>>
+        <%= lang==='vi' ? 'Phòng học' : 'Classroom' %>
+      </option>
+      <option value="lab"          <%= filterRoomType==='lab'          ? 'selected' : '' %>>
+        <%= lang==='vi' ? 'Phòng lab' : 'Lab' %>
+      </option>
+      <option value="meeting_room" <%= filterRoomType==='meeting_room' ? 'selected' : '' %>>
+        <%= lang==='vi' ? 'Phòng họp' : 'Meeting Room' %>
+      </option>
+    </select>
+
+    <select name="status" class="form-select" style="width:auto;min-width:160px"
+            onchange="this.form.submit()">
+      <option value=""><%= lang==='vi' ? 'Tất cả trạng thái' : 'All status' %></option>
+      <option value="active"   <%= filterStatus==='active'   ? 'selected' : '' %>>
+        <%= lang==='vi' ? '✓ Đang dùng' : '✓ Active' %>
+      </option>
+      <option value="inactive" <%= filterStatus==='inactive' ? 'selected' : '' %>>
+        <%= lang==='vi' ? '— Ngừng' : '— Inactive' %>
+      </option>
+    </select>
+
+    <% if (search || filterRoomType || filterStatus) { %>
+      <a href="/classrooms" class="btn btn-outline-secondary">
+        <i class="bi bi-x me-1"></i><%= lang==='vi' ? 'Xóa bộ lọc' : 'Clear' %>
+      </a>
+    <% } %>
+
+    <button type="submit" class="btn btn-primary">
+      <%= lang==='vi' ? 'Tìm' : 'Search' %>
+    </button>
+  </div>
+</form>
+
+<!-- Table -->
+<div class="card p-0">
+  <% if (rows.length === 0) { %>
+    <div class="text-center py-5">
+      <i class="bi bi-door-open" style="font-size:40px;color:var(--stone)"></i>
+      <p class="mt-3 text-muted"><%= t('common.no_data') %></p>
+      <a href="/classrooms/new" class="btn btn-primary btn-sm mt-1">
+        <i class="bi bi-plus-circle me-1"></i><%= t('classrooms.add') %>
+      </a>
+    </div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th><%= t('classrooms.code') %></th>
+          <th><%= t('classrooms.name') %></th>
+          <th><%= t('classrooms.branch') %></th>
+          <th><%= t('classrooms.capacity') %></th>
+          <th><%= t('classrooms.type') %></th>
+          <th><%= t('common.status') %></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(r => {
+          const typeLabel = {
+            classroom:    lang==='vi' ? 'Phòng học'  : 'Classroom',
+            lab:          lang==='vi' ? 'Phòng lab'  : 'Lab',
+            meeting_room: lang==='vi' ? 'Phòng họp'  : 'Meeting Room',
+          }[r.room_type] || r.room_type;
+        %>
+        <tr>
+          <td>
+            <code style="font-size:12px;color:var(--ash)"><%= r.room_code %></code>
+          </td>
+          <td>
+            <a href="/classrooms/<%= r.id %>" class="fw-semibold text-decoration-none" style="color:var(--ink)">
+              <%= r.room_name %>
+            </a>
+          </td>
+          <td style="color:var(--ash)"><%= r.branch_name || '—' %></td>
+          <td style="color:var(--ash)"><%= r.capacity %> <%= lang==='vi' ? 'chỗ' : 'seats' %></td>
+          <td style="color:var(--ash)"><%= typeLabel %></td>
+          <td>
+            <% const b = r.status==='active'
+              ? { cls:'badge-active',   lbl: lang==='vi' ? 'Đang dùng' : 'Active' }
+              : { cls:'badge-inactive', lbl: lang==='vi' ? 'Ngừng'     : 'Inactive' }; %>
+            <span class="badge <%= b.cls %>" style="padding:4px 10px"><%= b.lbl %></span>
+          </td>
+          <td class="text-end">
+            <div class="d-flex justify-content-end gap-1">
+              <a href="/classrooms/<%= r.id %>"
+                 class="btn btn-sm btn-outline-secondary" title="<%= lang==='vi' ? 'Xem' : 'View' %>">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="/classrooms/<%= r.id %>/edit"
+                 class="btn btn-sm btn-outline-secondary" title="<%= t('common.edit') %>">
+                <i class="bi bi-pencil"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<!-- Pagination -->
+<% if (totalPages > 1) { %>
+<nav class="d-flex justify-content-between align-items-center mt-4">
+  <span class="small text-muted">
+    <%= lang==='vi'
+      ? `Trang ${page} / ${totalPages} — ${total} phòng học`
+      : `Page ${page} of ${totalPages} — ${total} classrooms` %>
+  </span>
+  <ul class="pagination pagination-sm mb-0">
+    <li class="page-item <%= page<=1 ? 'disabled' : '' %>">
+      <a class="page-link"
+         href="?page=<%= page-1 %>&search=<%= search %>&room_type=<%= filterRoomType %>&status=<%= filterStatus %>">
+        <i class="bi bi-chevron-left"></i>
+      </a>
+    </li>
+    <% for(let p=Math.max(1,page-2); p<=Math.min(totalPages,page+2); p++) { %>
+      <li class="page-item <%= p===page ? 'active' : '' %>">
+        <a class="page-link"
+           href="?page=<%= p %>&search=<%= search %>&room_type=<%= filterRoomType %>&status=<%= filterStatus %>">
+          <%= p %>
+        </a>
+      </li>
+    <% } %>
+    <li class="page-item <%= page>=totalPages ? 'disabled' : '' %>">
+      <a class="page-link"
+         href="?page=<%= page+1 %>&search=<%= search %>&room_type=<%= filterRoomType %>&status=<%= filterStatus %>">
+        <i class="bi bi-chevron-right"></i>
+      </a>
+    </li>
+  </ul>
+</nav>
+<% } %>
+
+<style>
+.page-link { border-color: var(--hairline); color: var(--ink); font-size:13px }
+.page-item.active .page-link { background: var(--rausch); border-color: var(--rausch); }
+</style>

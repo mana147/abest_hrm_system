@@ -1,0 +1,138 @@
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/courses" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-journal-bookmark me-1"></i><%= t('courses.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)"><%= course.course_name %></span>
+</nav>
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+  <!-- Icon + name -->
+  <div class="d-flex align-items-center gap-3">
+    <div style="
+      width:56px;height:56px;border-radius:12px;background:var(--rausch);
+      display:flex;align-items:center;justify-content:center;
+      font-size:22px;font-weight:700;color:#fff;flex-shrink:0">
+      <i class="bi bi-journal-bookmark"></i>
+    </div>
+    <div>
+      <h5 class="mb-0 fw-bold" style="font-size:18px"><%= course.course_name %></h5>
+      <div style="font-size:13px;color:var(--ash)">
+        <code><%= course.course_code %></code>
+        &nbsp;·&nbsp;
+        <% const b = course.status==='active'
+          ? { cls:'badge-active',   lbl: lang==='vi' ? 'Đang dạy' : 'Active' }
+          : { cls:'badge-inactive', lbl: lang==='vi' ? 'Ngừng'    : 'Inactive' }; %>
+        <span class="badge <%= b.cls %>" style="padding:3px 10px"><%= b.lbl %></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="d-flex gap-2">
+    <a href="/courses/<%= course.id %>/edit" class="btn btn-primary">
+      <i class="bi bi-pencil me-2"></i><%= t('common.edit') %>
+    </a>
+    <a href="/courses" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i><%= t('common.back') %>
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+
+  <!-- LEFT -->
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-journal-bookmark me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Thông tin khóa học' : 'Course information' %>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-borderless mb-0">
+          <% const infoRows = [
+            [t('courses.code'),     course.course_code],
+            [t('courses.name'),     course.course_name],
+            [t('courses.level'),    course.level || '—'],
+            [t('courses.sessions'), course.total_sessions + (lang==='vi' ? ' buổi' : ' sessions')],
+            [t('courses.duration'), course.session_duration_minutes + (lang==='vi' ? ' phút/buổi' : ' min/session')],
+            [t('courses.fee'),      Number(course.tuition_fee).toLocaleString('vi-VN') + ' ₫'],
+          ]; %>
+          <% infoRows.forEach(([label, value]) => { %>
+          <tr style="border-bottom:1px solid var(--hairline)">
+            <td style="width:200px;padding:12px 20px;font-size:13px;color:var(--ash);font-weight:500">
+              <%= label %>
+            </td>
+            <td style="padding:12px 20px;font-size:14px;color:var(--ink)">
+              <%= value %>
+            </td>
+          </tr>
+          <% }) %>
+        </table>
+      </div>
+    </div>
+
+    <% if (course.description) { %>
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-journal me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Mô tả' : 'Description' %>
+      </div>
+      <div class="card-body">
+        <p class="mb-0" style="font-size:14px;color:var(--ink);white-space:pre-line;line-height:1.6">
+          <%= course.description %>
+        </p>
+      </div>
+    </div>
+    <% } %>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-clock-history me-2" style="color:var(--rausch)"></i>
+        <%= lang==='vi' ? 'Hệ thống' : 'System' %>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-borderless mb-0">
+          <tr style="border-bottom:1px solid var(--hairline)">
+            <td style="padding:12px 16px;font-size:12px;color:var(--ash)">
+              <%= lang==='vi' ? 'Ngày tạo' : 'Created' %>
+            </td>
+            <td style="padding:12px 16px;font-size:13px;color:var(--ink)">
+              <%= new Date(course.created_at).toLocaleString(lang==='vi' ? 'vi-VN' : 'en-GB') %>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:12px 16px;font-size:12px;color:var(--ash)">
+              <%= lang==='vi' ? 'Mã khóa học' : 'Course code' %>
+            </td>
+            <td style="padding:12px 16px">
+              <code style="font-size:13px"><%= course.course_code %></code>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-body d-flex flex-column gap-2">
+        <a href="/courses/<%= course.id %>/edit" class="btn btn-primary w-100">
+          <i class="bi bi-pencil me-2"></i><%= t('common.edit') %>
+        </a>
+        <% if (course.status !== 'inactive') { %>
+          <form method="POST" action="/courses/<%= course.id %>/delete"
+                onsubmit="return confirm('<%= lang==='vi' ? 'Ngừng khóa học này?' : 'Deactivate this course?' %>')">
+            <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+              <i class="bi bi-slash-circle me-2"></i>
+              <%= lang==='vi' ? 'Ngừng khóa học' : 'Deactivate' %>
+            </button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+</div>

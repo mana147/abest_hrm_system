@@ -13,9 +13,9 @@ Auth & Dashboard  ████████████████████ 1
 Landing Page      ████████████████████ 100%
 Students          ████████████████████ 100%
 Teachers          ████████████████████ 100%
-Courses           ░░░░░░░░░░░░░░░░░░░░   0%
-Timeslots         ░░░░░░░░░░░░░░░░░░░░   0%
-Classrooms        ░░░░░░░░░░░░░░░░░░░░   0%
+Courses           ████████████████████ 100%
+Timeslots         ████████████████████ 100%
+Classrooms        ████████████████████ 100%
 Schedule Lines    ░░░░░░░░░░░░░░░░░░░░   0%
 Classes           ░░░░░░░░░░░░░░░░░░░░   0%
 Enrollments       ░░░░░░░░░░░░░░░░░░░░   0%
@@ -91,25 +91,24 @@ Finance           ░░░░░░░░░░░░░░░░░░░░  
 
 ### Tầng 1 — Master Data (prerequisite cho scheduling)
 
-#### Courses (`/courses`) — Priority 1
-- [ ] Model: list, findById, create, update, softDelete
-- [ ] Controller + Routes (7)
-- [ ] View: index (list + filter level/status)
-- [ ] View: form (level dropdown, fee input, session count)
-- [ ] View: show
-- [ ] Feature map: `feature_map/COURSES_FEATURE_MAP.md`
+#### Courses (`/courses`) — Priority 1 ✅
+- [x] Model: list, findById, create, update, softDelete
+- [x] Controller + Routes (7)
+- [x] View: index (list + filter level/status)
+- [x] View: form (level dropdown, fee input, session count)
+- [x] View: show
 
-#### Timeslots (`/timeslots`) — Priority 2
-- [ ] Model: list, findById, create, update, softDelete
-- [ ] Controller + Routes (7)
-- [ ] View: index (hiển thị weekdays_pattern đẹp)
-- [ ] View: form (checkbox ngày trong tuần + time input)
-- [ ] View: show
+#### Timeslots (`/timeslots`) — Priority 2 ✅
+- [x] Model: list, findById, create, update, softDelete
+- [x] Controller + Routes (7)
+- [x] View: index (hiển thị weekdays_pattern đẹp T2-T4-T6)
+- [x] View: form (checkbox ngày trong tuần + time input)
+- [x] View: show
 
-#### Classrooms (`/classrooms`) — Priority 3
-- [ ] Model: list, findById, create, update, softDelete
-- [ ] Controller + Routes (7)
-- [ ] View: index + form + show
+#### Classrooms (`/classrooms`) — Priority 3 ✅
+- [x] Model: list, findById, create, update, softDelete (JOIN branches)
+- [x] Controller + Routes (7)
+- [x] View: index + form + show
 
 ---
 

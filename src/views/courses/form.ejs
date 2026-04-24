@@ -1,0 +1,176 @@
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/courses" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-journal-bookmark me-1"></i><%= t('courses.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)">
+    <%= course ? t('common.edit') : t('courses.add') %>
+  </span>
+</nav>
+
+<div class="page-header">
+  <div class="page-title">
+    <%= course ? t('common.edit') + ' — ' + course.course_name : t('courses.add') %>
+  </div>
+  <% if (course) { %>
+    <div class="page-sub">
+      <%= lang==='vi' ? 'Mã khóa học' : 'Course code' %>:
+      <code style="font-size:13px"><%= course.course_code %></code>
+    </div>
+  <% } %>
+</div>
+
+<form method="POST" action="<%= action %>" novalidate>
+  <div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-8">
+
+      <!-- Basic info -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-journal-bookmark me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Thông tin khóa học' : 'Course information' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('courses.code') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="course_code" class="form-control"
+                     value="<%= course?.course_code || '' %>"
+                     placeholder="TOEIC_FDN"
+                     required autofocus>
+            </div>
+
+            <div class="col-md-8">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('courses.name') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="course_name" class="form-control"
+                     value="<%= course?.course_name || '' %>"
+                     placeholder="<%= lang==='vi' ? 'Tên đầy đủ của khóa học' : 'Full course name' %>"
+                     required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('courses.level') %>
+              </label>
+              <select name="level" class="form-select">
+                <option value="">—</option>
+                <% levels.forEach(lv => { %>
+                  <option value="<%= lv %>" <%= course?.level===lv ? 'selected' : '' %>><%= lv %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('courses.fee') %>
+              </label>
+              <div class="input-group">
+                <input type="number" name="tuition_fee" class="form-control"
+                       value="<%= course?.tuition_fee || 0 %>"
+                       min="0" step="1000">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">₫</span>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('courses.sessions') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <div class="input-group">
+                <input type="number" name="total_sessions" class="form-control"
+                       value="<%= course?.total_sessions || '' %>"
+                       min="1" required>
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <%= lang==='vi' ? 'buổi' : 'sessions' %>
+                </span>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('courses.duration') %>
+              </label>
+              <div class="input-group">
+                <input type="number" name="session_duration_minutes" class="form-control"
+                       value="<%= course?.session_duration_minutes || 120 %>"
+                       min="30" step="15">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <%= lang==='vi' ? 'phút' : 'min' %>
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-journal me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Mô tả' : 'Description' %>
+        </div>
+        <div class="card-body">
+          <textarea name="description" class="form-control" rows="4"
+                    placeholder="<%= lang==='vi' ? 'Mô tả nội dung khóa học, mục tiêu...' : 'Describe course content, objectives...' %>"
+                    style="resize:vertical"><%= course?.description || '' %></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-4">
+
+      <!-- Status -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-sliders me-2" style="color:var(--rausch)"></i>
+          <%= t('common.status') %>
+        </div>
+        <div class="card-body">
+          <select name="status" class="form-select">
+            <option value="active"   <%= (!course || course.status==='active')   ? 'selected' : '' %>>
+              <%= lang==='vi' ? '✓ Đang dạy' : '✓ Active' %>
+            </option>
+            <option value="inactive" <%= course?.status==='inactive' ? 'selected' : '' %>>
+              <%= lang==='vi' ? '— Ngừng' : '— Inactive' %>
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-body d-flex flex-column gap-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check2 me-2"></i><%= t('common.save') %>
+          </button>
+          <a href="<%= course ? '/courses/' + course.id : '/courses' %>"
+             class="btn btn-outline-secondary w-100">
+            <i class="bi bi-x me-2"></i><%= t('common.cancel') %>
+          </a>
+          <% if (course && course.status !== 'inactive') { %>
+            <hr class="my-1">
+            <form method="POST" action="/courses/<%= course.id %>/delete"
+                  onsubmit="return confirm('<%= lang==='vi' ? 'Ngừng khóa học này?' : 'Deactivate this course?' %>')">
+              <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                <i class="bi bi-slash-circle me-2"></i>
+                <%= lang==='vi' ? 'Ngừng khóa học' : 'Deactivate' %>
+              </button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>

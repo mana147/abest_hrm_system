@@ -1,0 +1,164 @@
+<%
+const DAY_LABELS = { '0':'CN','1':'T2','2':'T3','3':'T4','4':'T5','5':'T6','6':'T7' };
+function showWeekdays(pattern) {
+  if (!pattern) return '—';
+  return pattern.split(',').map(d => DAY_LABELS[d] || d).join('-');
+}
+%>
+
+<!-- Page header -->
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div class="page-header mb-0">
+    <div class="page-title"><%= t('timeslots.title') %></div>
+    <div class="page-sub"><%= total %> <%= lang==='vi' ? 'khung giờ' : 'timeslots' %></div>
+  </div>
+  <a href="/timeslots/new" class="btn btn-primary">
+    <i class="bi bi-plus-circle me-2"></i><%= t('timeslots.add') %>
+  </a>
+</div>
+
+<!-- Search + Filter bar -->
+<form method="GET" action="/timeslots" class="mb-4">
+  <div class="d-flex gap-2 flex-wrap">
+    <div class="input-group" style="max-width:320px">
+      <span class="input-group-text bg-white border-end-0" style="border-color:var(--hairline)">
+        <i class="bi bi-search text-muted"></i>
+      </span>
+      <input type="text" name="search" class="form-control border-start-0 ps-0"
+             style="border-color:var(--hairline)"
+             placeholder="<%= lang==='vi' ? 'Tìm nhãn, mã khung giờ...' : 'Search label, code...' %>"
+             value="<%= search %>">
+    </div>
+
+    <select name="status" class="form-select" style="width:auto;min-width:160px"
+            onchange="this.form.submit()">
+      <option value=""><%= lang==='vi' ? 'Tất cả trạng thái' : 'All status' %></option>
+      <option value="active"   <%= filterStatus==='active'   ? 'selected' : '' %>>
+        <%= lang==='vi' ? '✓ Đang dùng' : '✓ Active' %>
+      </option>
+      <option value="inactive" <%= filterStatus==='inactive' ? 'selected' : '' %>>
+        <%= lang==='vi' ? '— Ngừng' : '— Inactive' %>
+      </option>
+    </select>
+
+    <% if (search || filterStatus) { %>
+      <a href="/timeslots" class="btn btn-outline-secondary">
+        <i class="bi bi-x me-1"></i><%= lang==='vi' ? 'Xóa bộ lọc' : 'Clear' %>
+      </a>
+    <% } %>
+
+    <button type="submit" class="btn btn-primary">
+      <%= lang==='vi' ? 'Tìm' : 'Search' %>
+    </button>
+  </div>
+</form>
+
+<!-- Table -->
+<div class="card p-0">
+  <% if (rows.length === 0) { %>
+    <div class="text-center py-5">
+      <i class="bi bi-clock" style="font-size:40px;color:var(--stone)"></i>
+      <p class="mt-3 text-muted"><%= t('common.no_data') %></p>
+      <a href="/timeslots/new" class="btn btn-primary btn-sm mt-1">
+        <i class="bi bi-plus-circle me-1"></i><%= t('timeslots.add') %>
+      </a>
+    </div>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th><%= t('timeslots.code') %></th>
+          <th><%= t('timeslots.label') %></th>
+          <th><%= t('timeslots.weekdays') %></th>
+          <th><%= lang==='vi' ? 'Giờ học' : 'Time' %></th>
+          <th><%= t('timeslots.per_week') %></th>
+          <th><%= t('common.status') %></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(ts => { %>
+        <tr>
+          <td>
+            <code style="font-size:12px;color:var(--ash)"><%= ts.timeslot_code %></code>
+          </td>
+          <td>
+            <a href="/timeslots/<%= ts.id %>" class="fw-semibold text-decoration-none" style="color:var(--ink)">
+              <%= ts.label %>
+            </a>
+          </td>
+          <td>
+            <span class="fw-semibold" style="color:var(--rausch)">
+              <%= showWeekdays(ts.weekdays_pattern) %>
+            </span>
+          </td>
+          <td style="color:var(--ash)">
+            <%= ts.start_time %> – <%= ts.end_time %>
+          </td>
+          <td style="color:var(--ash)">
+            <%= ts.sessions_per_week %> <%= lang==='vi' ? 'buổi/tuần' : 'sessions/wk' %>
+          </td>
+          <td>
+            <% const b = ts.status==='active'
+              ? { cls:'badge-active',   lbl: lang==='vi' ? 'Đang dùng' : 'Active' }
+              : { cls:'badge-inactive', lbl: lang==='vi' ? 'Ngừng'     : 'Inactive' }; %>
+            <span class="badge <%= b.cls %>" style="padding:4px 10px"><%= b.lbl %></span>
+          </td>
+          <td class="text-end">
+            <div class="d-flex justify-content-end gap-1">
+              <a href="/timeslots/<%= ts.id %>"
+                 class="btn btn-sm btn-outline-secondary" title="<%= lang==='vi' ? 'Xem' : 'View' %>">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="/timeslots/<%= ts.id %>/edit"
+                 class="btn btn-sm btn-outline-secondary" title="<%= t('common.edit') %>">
+                <i class="bi bi-pencil"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<!-- Pagination -->
+<% if (totalPages > 1) { %>
+<nav class="d-flex justify-content-between align-items-center mt-4">
+  <span class="small text-muted">
+    <%= lang==='vi'
+      ? `Trang ${page} / ${totalPages} — ${total} khung giờ`
+      : `Page ${page} of ${totalPages} — ${total} timeslots` %>
+  </span>
+  <ul class="pagination pagination-sm mb-0">
+    <li class="page-item <%= page<=1 ? 'disabled' : '' %>">
+      <a class="page-link"
+         href="?page=<%= page-1 %>&search=<%= search %>&status=<%= filterStatus %>">
+        <i class="bi bi-chevron-left"></i>
+      </a>
+    </li>
+    <% for(let p=Math.max(1,page-2); p<=Math.min(totalPages,page+2); p++) { %>
+      <li class="page-item <%= p===page ? 'active' : '' %>">
+        <a class="page-link"
+           href="?page=<%= p %>&search=<%= search %>&status=<%= filterStatus %>">
+          <%= p %>
+        </a>
+      </li>
+    <% } %>
+    <li class="page-item <%= page>=totalPages ? 'disabled' : '' %>">
+      <a class="page-link"
+         href="?page=<%= page+1 %>&search=<%= search %>&status=<%= filterStatus %>">
+        <i class="bi bi-chevron-right"></i>
+      </a>
+    </li>
+  </ul>
+</nav>
+<% } %>
+
+<style>
+.page-link { border-color: var(--hairline); color: var(--ink); font-size:13px }
+.page-item.active .page-link { background: var(--rausch); border-color: var(--rausch); }
+</style>

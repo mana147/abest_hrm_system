@@ -1,0 +1,169 @@
+<!-- Breadcrumb -->
+<nav class="mb-4" style="font-size:13px;color:var(--ash)">
+  <a href="/classrooms" style="color:var(--ash);text-decoration:none">
+    <i class="bi bi-door-open me-1"></i><%= t('classrooms.title') %>
+  </a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--ink)">
+    <%= classroom ? t('common.edit') : t('classrooms.add') %>
+  </span>
+</nav>
+
+<div class="page-header">
+  <div class="page-title">
+    <%= classroom ? t('common.edit') + ' — ' + classroom.room_name : t('classrooms.add') %>
+  </div>
+  <% if (classroom) { %>
+    <div class="page-sub">
+      <%= lang==='vi' ? 'Mã phòng' : 'Room code' %>:
+      <code style="font-size:13px"><%= classroom.room_code %></code>
+    </div>
+  <% } %>
+</div>
+
+<form method="POST" action="<%= action %>" novalidate>
+  <div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-8">
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-door-open me-2" style="color:var(--rausch)"></i>
+          <%= lang==='vi' ? 'Thông tin phòng học' : 'Classroom information' %>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classrooms.code') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="room_code" class="form-control"
+                     value="<%= classroom?.room_code || '' %>"
+                     placeholder="P101"
+                     required autofocus>
+            </div>
+
+            <div class="col-md-8">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classrooms.name') %> <span style="color:var(--rausch)">*</span>
+              </label>
+              <input type="text" name="room_name" class="form-control"
+                     value="<%= classroom?.room_name || '' %>"
+                     placeholder="<%= lang==='vi' ? 'Phòng 101' : 'Room 101' %>"
+                     required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classrooms.type') %>
+              </label>
+              <select name="room_type" class="form-select">
+                <option value="classroom"    <%= (!classroom || classroom.room_type==='classroom')    ? 'selected' : '' %>>
+                  <%= lang==='vi' ? 'Phòng học' : 'Classroom' %>
+                </option>
+                <option value="lab"          <%= classroom?.room_type==='lab'          ? 'selected' : '' %>>
+                  <%= lang==='vi' ? 'Phòng lab' : 'Lab' %>
+                </option>
+                <option value="meeting_room" <%= classroom?.room_type==='meeting_room' ? 'selected' : '' %>>
+                  <%= lang==='vi' ? 'Phòng họp' : 'Meeting Room' %>
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classrooms.capacity') %>
+              </label>
+              <div class="input-group">
+                <input type="number" name="capacity" class="form-control"
+                       value="<%= classroom?.capacity || 20 %>"
+                       min="1">
+                <span class="input-group-text bg-white" style="border-color:var(--hairline)">
+                  <%= lang==='vi' ? 'chỗ' : 'seats' %>
+                </span>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px">
+                <%= t('classrooms.branch') %>
+              </label>
+              <select name="branch_id" class="form-select">
+                <option value="">— <%= lang==='vi' ? 'Không xác định' : 'Not assigned' %></option>
+                <% branches.forEach(br => { %>
+                  <option value="<%= br.id %>"
+                    <%= String(classroom?.branch_id) === String(br.id) ? 'selected' : '' %>>
+                    <%= br.branch_name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-journal me-2" style="color:var(--rausch)"></i>
+          <%= t('common.note') %>
+        </div>
+        <div class="card-body">
+          <textarea name="note" class="form-control" rows="3"
+                    placeholder="<%= lang==='vi' ? 'Ghi chú về phòng học, thiết bị...' : 'Notes about the room, equipment...' %>"
+                    style="resize:vertical"><%= classroom?.note || '' %></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-4">
+
+      <!-- Status -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-sliders me-2" style="color:var(--rausch)"></i>
+          <%= t('common.status') %>
+        </div>
+        <div class="card-body">
+          <select name="status" class="form-select">
+            <option value="active"   <%= (!classroom || classroom.status==='active')   ? 'selected' : '' %>>
+              <%= lang==='vi' ? '✓ Đang dùng' : '✓ Active' %>
+            </option>
+            <option value="inactive" <%= classroom?.status==='inactive' ? 'selected' : '' %>>
+              <%= lang==='vi' ? '— Ngừng' : '— Inactive' %>
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-body d-flex flex-column gap-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check2 me-2"></i><%= t('common.save') %>
+          </button>
+          <a href="<%= classroom ? '/classrooms/' + classroom.id : '/classrooms' %>"
+             class="btn btn-outline-secondary w-100">
+            <i class="bi bi-x me-2"></i><%= t('common.cancel') %>
+          </a>
+          <% if (classroom && classroom.status !== 'inactive') { %>
+            <hr class="my-1">
+            <form method="POST" action="/classrooms/<%= classroom.id %>/delete"
+                  onsubmit="return confirm('<%= lang==='vi' ? 'Ngừng phòng học này?' : 'Deactivate this classroom?' %>')">
+              <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                <i class="bi bi-slash-circle me-2"></i>
+                <%= lang==='vi' ? 'Ngừng phòng học' : 'Deactivate' %>
+              </button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>

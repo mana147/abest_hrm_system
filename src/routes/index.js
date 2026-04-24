@@ -27,6 +27,11 @@ router.use('/students', require('./students'));
 // Teachers
 router.use('/teachers', require('./teachers'));
 
+// Master data
+router.use('/courses',    require('./courses'));
+router.use('/timeslots',  require('./timeslots'));
+router.use('/classrooms', require('./classrooms'));
+
 // Landing page (public)
 router.get('/', (req, res) => {
   if (req.session.user) return res.redirect('/dashboard');
