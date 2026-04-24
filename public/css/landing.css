@@ -74,6 +74,29 @@ body {
 }
 .lp-nav-links a:hover { background: rgba(0,0,0,0.06); }
 
+.lp-nav:not(.scrolled) .lp-logo-text,
+.lp-nav:not(.scrolled) .lp-nav-links a,
+.lp-nav:not(.scrolled) .lp-btn-ghost {
+  color: #fff;
+}
+.lp-nav:not(.scrolled) .lp-nav-links a:hover {
+  background: rgba(255,255,255,0.14);
+}
+.lp-nav:not(.scrolled) .lp-lang-group {
+  border-color: rgba(255,255,255,0.22);
+}
+.lp-nav:not(.scrolled) .lp-lang-btn {
+  color: rgba(255,255,255,0.85);
+}
+.lp-nav:not(.scrolled) .lp-lang-btn.active {
+  background: #fff;
+  color: var(--ink);
+}
+.lp-nav:not(.scrolled) .lp-lang-btn:hover:not(.active) {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
 .lp-lang-group { display: flex; border: 1px solid var(--hairline); border-radius: 20px; overflow: hidden; }
 .lp-lang-btn {
   padding: 5px 12px; font-size: 12px; font-weight: 600;
