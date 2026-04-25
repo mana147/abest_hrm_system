@@ -16,8 +16,9 @@ Teachers          ████████████████████ 1
 Courses           ████████████████████ 100%
 Timeslots         ████████████████████ 100%
 Classrooms        ████████████████████ 100%
-Schedule Lines    ░░░░░░░░░░░░░░░░░░░░   0%
-Classes           ░░░░░░░░░░░░░░░░░░░░   0%
+Schedule Lines    ████████████████████ 100%
+Classes           ████████████████████ 100%
+Class Sessions    ████████████░░░░░░░░  60%  (auto-gen ✓ | reschedule/holiday UI ✗)
 Enrollments       ░░░░░░░░░░░░░░░░░░░░   0%
 Attendance        ░░░░░░░░░░░░░░░░░░░░   0%
 Finance           ░░░░░░░░░░░░░░░░░░░░   0%
@@ -87,54 +88,60 @@ Finance           ░░░░░░░░░░░░░░░░░░░░  
 
 ---
 
-## 🔄 Đang làm / Ưu tiên tiếp theo
+## ✅ Đã hoàn thành (tiếp theo)
 
-### Tầng 1 — Master Data (prerequisite cho scheduling)
+### Tầng 1 — Master Data
 
-#### Courses (`/courses`) — Priority 1 ✅
+#### Courses (`/courses`) ✅
 - [x] Model: list, findById, create, update, softDelete
 - [x] Controller + Routes (7)
 - [x] View: index (list + filter level/status)
 - [x] View: form (level dropdown, fee input, session count)
 - [x] View: show
 
-#### Timeslots (`/timeslots`) — Priority 2 ✅
+#### Timeslots (`/timeslots`) ✅
 - [x] Model: list, findById, create, update, softDelete
 - [x] Controller + Routes (7)
 - [x] View: index (hiển thị weekdays_pattern đẹp T2-T4-T6)
 - [x] View: form (checkbox ngày trong tuần + time input)
 - [x] View: show
 
-#### Classrooms (`/classrooms`) — Priority 3 ✅
+#### Classrooms (`/classrooms`) ✅
 - [x] Model: list, findById, create, update, softDelete (JOIN branches)
 - [x] Controller + Routes (7)
 - [x] View: index + form + show
 
+### Tầng 2 — Scheduling
+
+#### Schedule Lines (`/schedule-lines`) ✅
+- [x] Model: list (JOIN classrooms+timeslots+active_class), findById, create, update, deactivate
+- [x] getFormOptions (classrooms, timeslots, courses, branches)
+- [x] getActiveClass — hiển thị lớp đang chạy trên line
+- [x] Controller + Routes (7)
+- [x] View: index (trạng thái đang có lớp / đang trống) + form + show
+
+#### Classes (`/classes`) ✅
+- [x] Model: list (JOIN courses+teachers+classrooms+timeslots), findById, create, update
+- [x] Auto-generate `class_sessions` khi tạo lớp (batch INSERT trong transaction)
+- [x] Tự tính `expected_end_date` (bỏ qua ngày nghỉ lễ từ bảng `holidays`)
+- [x] Tự tính `next_opening_available_date` (buffer 3 ngày + khớp weekdays_pattern)
+- [x] Kiểm tra conflict: `getActiveClassOnLine` (1 line = 1 lớp active)
+- [x] Status flow + validation: `VALID_TRANSITIONS` map (planned→open_enrollment→ongoing→completed)
+- [x] `updateStatus` — POST `/:id/status`
+- [x] `updateSession` — POST `/:id/sessions/:sessionId` (đổi trạng thái buổi học)
+- [x] `src/utils/scheduling.js` — helpers: generateSessionDates, calcExpectedEndDate, calcNextOpeningDate, generateClassCode
+- [x] Controller + Routes (9 routes)
+- [x] View: index + form + show
+
+#### Class Sessions (partial)
+- [x] Auto-generate khi tạo class
+- [x] Cập nhật trạng thái buổi học (scheduled/completed/cancelled/rescheduled)
+- [ ] UI đổi lịch / học bù (rescheduled) — chưa có form riêng
+- [ ] UI nghỉ lễ batch cancel
+
 ---
 
 ## ⬜ Chưa làm
-
-### Tầng 2 — Scheduling (phụ thuộc tầng 1)
-
-#### Schedule Lines (`/schedule-lines`)
-- [ ] CRUD + validation (không trùng classroom+timeslot)
-- [ ] Hiển thị trạng thái: đang có lớp hay đang trống
-- [ ] Gợi ý next_opening_available_date
-
-#### Classes (`/classes`) ← Module phức tạp nhất
-- [ ] CRUD
-- [ ] Auto-generate class_sessions từ timeslot pattern
-- [ ] Tự tính `expected_end_date` (bỏ qua holidays)
-- [ ] Tự tính `next_opening_available_date`
-- [ ] Kiểm tra conflict (1 line = 1 lớp active)
-- [ ] Class status flow: planned → open_enrollment → ongoing → completed
-
-#### Class Sessions
-- [ ] Auto-generate khi tạo class
-- [ ] Đổi lịch / học bù (rescheduled)
-- [ ] Nghỉ lễ (cancelled)
-
----
 
 ### Tầng 3 — Vận hành (phụ thuộc tầng 2)
 

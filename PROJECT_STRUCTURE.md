@@ -40,19 +40,36 @@ abest_hrm_system/
 │   │   ├── auth.js              ← requireAuth middleware
 │   │   ├── i18n.js              ← Language middleware (t('key'))
 │   │   └── role.js              ← requireRole(...roles) middleware
+│   ├── utils/
+│   │   └── scheduling.js        ← generateSessionDates, calcExpectedEndDate, calcNextOpeningDate, generateClassCode
 │   ├── models/
 │   │   ├── userModel.js         ← findByUsername, findById
 │   │   ├── studentModel.js      ← list, findById, create, update, softDelete
-│   │   └── teacherModel.js      ← list, findById, create, update, softDelete
+│   │   ├── teacherModel.js      ← list, findById, create, update, softDelete
+│   │   ├── courseModel.js       ← list, findById, create, update, softDelete
+│   │   ├── timeslotModel.js     ← list, findById, create, update, softDelete
+│   │   ├── classroomModel.js    ← list, findById, create, update, softDelete (JOIN branches)
+│   │   ├── scheduleLineModel.js ← list, findById, create, update, deactivate, getActiveClass, getFormOptions
+│   │   └── classModel.js        ← list, findById, create, update, updateStatus, updateSession, getSessions, getFormOptions
 │   ├── controllers/
-│   │   ├── authController.js    ← showLogin, login, logout
-│   │   ├── studentController.js ← index, showCreate, create, show, showEdit, update, destroy
-│   │   └── teacherController.js ← index, showCreate, create, show, showEdit, update, destroy
+│   │   ├── authController.js         ← showLogin, login, logout
+│   │   ├── studentController.js      ← index, showCreate, create, show, showEdit, update, destroy
+│   │   ├── teacherController.js      ← index, showCreate, create, show, showEdit, update, destroy
+│   │   ├── courseController.js       ← index, showCreate, create, show, showEdit, update, destroy
+│   │   ├── timeslotController.js     ← index, showCreate, create, show, showEdit, update, destroy
+│   │   ├── classroomController.js    ← index, showCreate, create, show, showEdit, update, destroy
+│   │   ├── scheduleLineController.js ← index, showCreate, create, show, showEdit, update, destroy
+│   │   └── classController.js        ← index, showCreate, create, show, showEdit, update, destroy, updateStatus, updateSession
 │   ├── routes/
 │   │   ├── index.js             ← Route aggregator + dashboard + language switch
 │   │   ├── auth.js              ← /auth/login, /auth/logout
 │   │   ├── students.js          ← /students CRUD
-│   │   └── teachers.js          ← /teachers CRUD
+│   │   ├── teachers.js          ← /teachers CRUD
+│   │   ├── courses.js           ← /courses CRUD
+│   │   ├── timeslots.js         ← /timeslots CRUD
+│   │   ├── classrooms.js        ← /classrooms CRUD
+│   │   ├── schedule-lines.js    ← /schedule-lines CRUD
+│   │   └── classes.js           ← /classes CRUD + /classes/:id/status + /classes/:id/sessions/:sessionId
 │   └── views/
 │       ├── layout/
 │       │   └── main.ejs         ← Layout chính (sidebar + topbar + flash)
@@ -68,6 +85,11 @@ abest_hrm_system/
 │       │   ├── index.ejs        ← List + specialty tags + contract type filter
 │       │   ├── form.ejs         ← Form với specialty checkboxes
 │       │   └── show.ejs         ← Detail + rate card
+│       ├── courses/             ← index + form + show
+│       ├── timeslots/           ← index + form + show
+│       ├── classrooms/          ← index + form + show
+│       ├── schedule-lines/      ← index + form + show
+│       ├── classes/             ← index + form + show (bao gồm danh sách class_sessions)
 │       ├── landing.ejs          ← Landing page công khai (standalone)
 │       └── error.ejs            ← 404/500 error page (standalone)
 │
@@ -121,8 +143,45 @@ abest_hrm_system/
 | GET | `/teachers/:id/edit` | teacherController.showEdit | ✓ | Form sửa giáo viên |
 | POST | `/teachers/:id` | teacherController.update | ✓ | Cập nhật giáo viên |
 | POST | `/teachers/:id/delete` | teacherController.destroy | ✓ | Soft delete giáo viên |
+| GET | `/courses` | courseController.index | ✓ | Danh sách khóa học |
+| GET | `/courses/new` | courseController.showCreate | ✓ | Form thêm khóa học |
+| POST | `/courses` | courseController.create | ✓ | Tạo khóa học |
+| GET | `/courses/:id` | courseController.show | ✓ | Chi tiết khóa học |
+| GET | `/courses/:id/edit` | courseController.showEdit | ✓ | Form sửa khóa học |
+| POST | `/courses/:id` | courseController.update | ✓ | Cập nhật khóa học |
+| POST | `/courses/:id/delete` | courseController.destroy | ✓ | Soft delete khóa học |
+| GET | `/timeslots` | timeslotController.index | ✓ | Danh sách khung giờ |
+| GET | `/timeslots/new` | timeslotController.showCreate | ✓ | Form thêm khung giờ |
+| POST | `/timeslots` | timeslotController.create | ✓ | Tạo khung giờ |
+| GET | `/timeslots/:id` | timeslotController.show | ✓ | Chi tiết khung giờ |
+| GET | `/timeslots/:id/edit` | timeslotController.showEdit | ✓ | Form sửa khung giờ |
+| POST | `/timeslots/:id` | timeslotController.update | ✓ | Cập nhật khung giờ |
+| POST | `/timeslots/:id/delete` | timeslotController.destroy | ✓ | Soft delete khung giờ |
+| GET | `/classrooms` | classroomController.index | ✓ | Danh sách phòng học |
+| GET | `/classrooms/new` | classroomController.showCreate | ✓ | Form thêm phòng học |
+| POST | `/classrooms` | classroomController.create | ✓ | Tạo phòng học |
+| GET | `/classrooms/:id` | classroomController.show | ✓ | Chi tiết phòng học |
+| GET | `/classrooms/:id/edit` | classroomController.showEdit | ✓ | Form sửa phòng học |
+| POST | `/classrooms/:id` | classroomController.update | ✓ | Cập nhật phòng học |
+| POST | `/classrooms/:id/delete` | classroomController.destroy | ✓ | Soft delete phòng học |
+| GET | `/schedule-lines` | scheduleLineController.index | ✓ | Danh sách đường vận hành |
+| GET | `/schedule-lines/new` | scheduleLineController.showCreate | ✓ | Form thêm schedule line |
+| POST | `/schedule-lines` | scheduleLineController.create | ✓ | Tạo schedule line |
+| GET | `/schedule-lines/:id` | scheduleLineController.show | ✓ | Chi tiết schedule line |
+| GET | `/schedule-lines/:id/edit` | scheduleLineController.showEdit | ✓ | Form sửa schedule line |
+| POST | `/schedule-lines/:id` | scheduleLineController.update | ✓ | Cập nhật schedule line |
+| POST | `/schedule-lines/:id/delete` | scheduleLineController.destroy | ✓ | Deactivate schedule line |
+| GET | `/classes` | classController.index | ✓ | Danh sách lớp khai giảng |
+| GET | `/classes/new` | classController.showCreate | ✓ | Form thêm lớp |
+| POST | `/classes` | classController.create | ✓ | Tạo lớp + auto-gen class_sessions |
+| GET | `/classes/:id` | classController.show | ✓ | Chi tiết lớp + danh sách buổi học |
+| GET | `/classes/:id/edit` | classController.showEdit | ✓ | Form sửa lớp |
+| POST | `/classes/:id` | classController.update | ✓ | Cập nhật lớp |
+| POST | `/classes/:id/delete` | classController.destroy | ✓ | Soft delete lớp |
+| POST | `/classes/:id/status` | classController.updateStatus | ✓ | Chuyển trạng thái lớp |
+| POST | `/classes/:id/sessions/:sessionId` | classController.updateSession | ✓ | Cập nhật trạng thái buổi học |
 
-> **Chưa có route:** `/courses`, `/classrooms`, `/timeslots`, `/schedule-lines`, `/classes`, `/enrollments`, `/attendance`, `/finance` — xem `ROADMAP.md`
+> **Chưa có route:** `/enrollments`, `/attendance`, `/finance` — xem `ROADMAP.md`
 
 ---
 
@@ -134,15 +193,15 @@ abest_hrm_system/
 | Nhân sự | `students` | `studentModel.js` ✓ |
 | Nhân sự | `teachers` | `teacherModel.js` ✓ |
 | Nhân sự | `staff` | Chưa có model |
-| Cơ sở | `branches` | Chưa có model |
-| Master data | `courses` | Chưa có model |
-| Master data | `timeslots` | Chưa có model |
-| Master data | `class_templates` | Chưa có model |
-| Master data | `classrooms` | Chưa có model |
-| Scheduling | `schedule_lines` | Chưa có model |
-| Scheduling | `classes` | Chưa có model |
-| Scheduling | `class_sessions` | Chưa có model |
-| Scheduling | `holidays` | Chưa có model |
+| Cơ sở | `branches` | Query inline trong classroomModel / scheduleLineModel |
+| Master data | `courses` | `courseModel.js` ✓ |
+| Master data | `timeslots` | `timeslotModel.js` ✓ |
+| Master data | `class_templates` | Chưa dùng |
+| Master data | `classrooms` | `classroomModel.js` ✓ |
+| Scheduling | `schedule_lines` | `scheduleLineModel.js` ✓ |
+| Scheduling | `classes` | `classModel.js` ✓ |
+| Scheduling | `class_sessions` | Embedded trong `classModel.js` (getSessions, updateSession) |
+| Scheduling | `holidays` | Query inline trong `classModel.getHolidaySet()` |
 | Scheduling | `room_blockings` | Chưa có model |
 | Transaction | `enrollments` | Chưa có model |
 | Transaction | `attendance` | Chưa có model |
@@ -164,6 +223,7 @@ ERD quan hệ: `database/erd.md`
 | `src/views/layout/main.ejs` | Thêm menu item vào sidebar |
 | `database/mysql_schema.sql` | Thêm/sửa bảng DB — sau đó chạy lại `db-init.js` |
 | `public/css/custom.css` | Thêm CSS component mới |
+| `src/utils/scheduling.js` | Sửa logic tính lịch (session dates, expected_end_date, next_opening_date) |
 
 ---
 
@@ -173,6 +233,7 @@ ERD quan hệ: `database/erd.md`
 ```
 students: HV + YYYYMM + 3 digits → HV202604001
 teachers: GV + YYYYMM + 3 digits → GV202604001
+classes:  {course_code} + YYYYMM  → TOEIC202604  (suffix -2, -3 nếu trùng)
 ```
 
 ### Pagination
