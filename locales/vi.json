@@ -152,7 +152,10 @@
     "updated": "Cập nhật thành công",
     "cancelled": "Đã hủy lớp học",
     "status_updated": "Đã cập nhật trạng thái lớp",
-    "session_updated": "Đã cập nhật buổi học"
+    "session_updated": "Đã cập nhật buổi học",
+    "reschedule_required": "Dời lịch yêu cầu phải có ngày học mới",
+    "holiday_cancelled": "Đã hủy %d buổi trùng lịch nghỉ lễ",
+    "no_holiday_sessions": "Không có buổi nào trùng ngày nghỉ lễ"
   },
   "schedule": {
     "title": "Lịch khai giảng",

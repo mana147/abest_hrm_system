@@ -152,7 +152,10 @@
     "updated": "Updated successfully",
     "cancelled": "Class cancelled",
     "status_updated": "Class status updated",
-    "session_updated": "Session updated"
+    "session_updated": "Session updated",
+    "reschedule_required": "Reschedule requires a new session date",
+    "holiday_cancelled": "Cancelled %d sessions conflicting with holidays",
+    "no_holiday_sessions": "No scheduled sessions conflict with holidays"
   },
   "schedule": {
     "title": "Class Schedule",

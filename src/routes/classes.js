@@ -13,4 +13,5 @@ router.post('/:id',                          ctrl.update);
 router.post('/:id/delete',                   ctrl.destroy);
 router.post('/:id/status',                   ctrl.updateStatus);
 router.post('/:id/sessions/:sessionId',      ctrl.updateSession);
+router.post('/:id/cancel-holidays',          ctrl.cancelHolidaySessions);
 module.exports = router;

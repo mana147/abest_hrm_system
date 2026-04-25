@@ -247,12 +247,106 @@ module.exports = {
     return db.run(`UPDATE classes SET status=? WHERE id=?`, [newStatus, id]);
   },
 
-  updateSession(sessionId, { status, note }) {
+  async updateSession(sessionId, { status, note, session_date, start_time, end_time, teacher_id, classroom_id }) {
     const validStatuses = ['scheduled', 'completed', 'cancelled', 'rescheduled'];
     if (!validStatuses.includes(status)) throw new Error('Trạng thái buổi học không hợp lệ');
-    return db.run(
-      `UPDATE class_sessions SET status=?, note=? WHERE id=?`,
-      [status, note?.trim() || null, sessionId]
+    if (status === 'rescheduled' && !session_date) throw new Error('Dời lịch yêu cầu phải có ngày học mới');
+
+    const conn = await db.pool.getConnection();
+    await conn.beginTransaction();
+    try {
+      const [sessionRows] = await conn.execute(
+        `SELECT class_id FROM class_sessions WHERE id = ?`, [sessionId]
+      );
+      if (!sessionRows.length) throw new Error('Buổi học không tồn tại');
+      const classId = sessionRows[0].class_id;
+
+      if (status === 'rescheduled' && session_date) {
+        await conn.execute(
+          `UPDATE class_sessions
+           SET status=?, note=?, session_date=?, start_time=?, end_time=?, teacher_id=?, classroom_id=?
+           WHERE id=?`,
+          [
+            status,
+            note?.trim() || null,
+            session_date,
+            start_time || null,
+            end_time   || null,
+            teacher_id || null,
+            classroom_id || null,
+            sessionId,
+          ]
+        );
+      } else {
+        await conn.execute(
+          `UPDATE class_sessions SET status=?, note=? WHERE id=?`,
+          [status, note?.trim() || null, sessionId]
+        );
+      }
+
+      const [[countRow]] = await conn.execute(
+        `SELECT COUNT(*) AS cnt FROM class_sessions WHERE class_id=? AND status='completed'`,
+        [classId]
+      );
+      await conn.execute(
+        `UPDATE classes SET sessions_completed=? WHERE id=?`,
+        [countRow.cnt, classId]
+      );
+
+      await conn.commit();
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  },
+
+  async countHolidaySessions(classId) {
+    const row = await db.get(
+      `SELECT COUNT(*) AS cnt
+       FROM class_sessions cs
+       JOIN holidays h ON h.holiday_date = cs.session_date
+       WHERE cs.class_id = ? AND cs.status = 'scheduled' AND h.is_active = 1`,
+      [classId]
     );
+    return row?.cnt || 0;
+  },
+
+  async batchCancelHolidaySessions(classId) {
+    const sessions = await db.query(
+      `SELECT cs.id, h.holiday_name
+       FROM class_sessions cs
+       JOIN holidays h ON h.holiday_date = cs.session_date
+       WHERE cs.class_id = ? AND cs.status = 'scheduled' AND h.is_active = 1`,
+      [classId]
+    );
+    if (sessions.length === 0) return 0;
+
+    const conn = await db.pool.getConnection();
+    await conn.beginTransaction();
+    try {
+      for (const s of sessions) {
+        await conn.execute(
+          `UPDATE class_sessions SET status='cancelled', note=? WHERE id=?`,
+          [`Nghỉ lễ: ${s.holiday_name}`, s.id]
+        );
+      }
+      const [[countRow]] = await conn.execute(
+        `SELECT COUNT(*) AS cnt FROM class_sessions WHERE class_id=? AND status='completed'`,
+        [classId]
+      );
+      await conn.execute(
+        `UPDATE classes SET sessions_completed=? WHERE id=?`,
+        [countRow.cnt, classId]
+      );
+      await conn.commit();
+      return sessions.length;
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
   },
 };

@@ -126,7 +126,22 @@ const TRANSITION_LABELS = {
           <i class="bi bi-list-ol me-2" style="color:var(--rausch)"></i>
           <%= lang==='vi' ? 'Danh sách buổi học' : 'Class sessions' %>
           <span class="badge bg-secondary ms-2"><%= sessions.length %></span>
+          <% if (holidayCount > 0) { %>
+          <span class="badge bg-warning text-dark ms-2">
+            <i class="bi bi-calendar-x me-1"></i>
+            <%= holidayCount %> <%= lang==='vi' ? 'buổi trùng lễ' : 'holiday conflicts' %>
+          </span>
+          <% } %>
         </div>
+        <% if (holidayCount > 0 && !['completed','cancelled'].includes(cls.status)) { %>
+        <form method="POST" action="/classes/<%= cls.id %>/cancel-holidays"
+              onsubmit="return confirm('<%= lang==='vi' ? `Hủy ${holidayCount} buổi trùng ngày nghỉ lễ?` : `Cancel ${holidayCount} holiday-conflicting sessions?` %>')">
+          <button type="submit" class="btn btn-sm btn-warning">
+            <i class="bi bi-calendar-x me-1"></i>
+            <%= lang==='vi' ? 'Hủy buổi nghỉ lễ' : 'Cancel holiday sessions' %> (<%= holidayCount %>)
+          </button>
+        </form>
+        <% } %>
       </div>
       <div class="table-responsive">
         <% if (sessions.length === 0) { %>
@@ -141,13 +156,14 @@ const TRANSITION_LABELS = {
               <th><%= lang==='vi' ? 'Giờ' : 'Time' %></th>
               <th><%= lang==='vi' ? 'Giáo viên' : 'Teacher' %></th>
               <th><%= t('common.status') %></th>
-              <th style="width:160px"><%= t('common.actions') %></th>
+              <th style="width:180px"><%= t('common.actions') %></th>
             </tr>
           </thead>
           <tbody>
             <% sessions.forEach(s => {
               const sb = SESSION_STATUS_MAP[s.status] || { cls:'badge-inactive', lbl: s.status };
               const isEditable = !['completed','cancelled'].includes(cls.status);
+              const fmtTime = t => t ? t.substring(0, 5) : '';
             %>
             <tr style="<%= s.status==='cancelled' ? 'opacity:0.5' : '' %>">
               <td class="fw-semibold" style="color:var(--ash)"><%= s.session_no %></td>
@@ -155,20 +171,24 @@ const TRANSITION_LABELS = {
                 <%= new Date(s.session_date).toLocaleDateString(lang==='vi' ? 'vi-VN' : 'en-GB') %>
               </td>
               <td style="color:var(--rausch);font-weight:600"><%= weekdayLabel(s.session_date) %></td>
-              <td style="color:var(--ash)"><%= s.start_time %> – <%= s.end_time %></td>
+              <td style="color:var(--ash)"><%= fmtTime(s.start_time) %> – <%= fmtTime(s.end_time) %></td>
               <td style="color:var(--ash)"><%= s.teacher_name || '—' %></td>
               <td><span class="badge <%= sb.cls %>" style="padding:3px 9px"><%= sb.lbl %></span></td>
               <td>
                 <% if (isEditable) { %>
                 <form method="POST" action="/classes/<%= cls.id %>/sessions/<%= s.id %>"
-                      class="d-flex gap-1">
-                  <select name="status" class="form-select form-select-sm" style="font-size:12px;width:110px">
+                      id="quick-form-<%= s.id %>" class="d-flex gap-1">
+                  <input type="hidden" name="note" value="<%= s.note || '' %>">
+                  <select name="status" class="form-select form-select-sm" style="font-size:12px;width:115px"
+                          onchange="handleStatusChange(<%= s.id %>, this.value)">
                     <option value="scheduled"   <%= s.status==='scheduled'   ? 'selected' : '' %>><%= lang==='vi' ? 'Chưa học'  : 'Scheduled' %></option>
                     <option value="completed"   <%= s.status==='completed'   ? 'selected' : '' %>><%= lang==='vi' ? 'Đã học'    : 'Completed' %></option>
                     <option value="cancelled"   <%= s.status==='cancelled'   ? 'selected' : '' %>><%= lang==='vi' ? 'Đã hủy'    : 'Cancelled' %></option>
                     <option value="rescheduled" <%= s.status==='rescheduled' ? 'selected' : '' %>><%= lang==='vi' ? 'Dời lịch'  : 'Rescheduled' %></option>
                   </select>
-                  <button type="submit" class="btn btn-sm btn-outline-secondary" style="padding:2px 8px;font-size:12px">
+                  <button type="submit" id="quick-submit-<%= s.id %>"
+                          class="btn btn-sm btn-outline-secondary" style="padding:2px 8px;font-size:12px"
+                          <%= s.status==='rescheduled' ? 'style="display:none"' : '' %>>
                     <i class="bi bi-check2"></i>
                   </button>
                 </form>
@@ -177,12 +197,92 @@ const TRANSITION_LABELS = {
                 <% } %>
               </td>
             </tr>
+            <!-- Reschedule row — chỉ hiện khi chọn "Dời lịch" -->
+            <% if (isEditable) { %>
+            <tr id="reschedule-row-<%= s.id %>" style="display:<%= s.status==='rescheduled' ? '' : 'none' %>;background:var(--cloud)">
+              <td colspan="7" style="padding:12px 16px">
+                <form method="POST" action="/classes/<%= cls.id %>/sessions/<%= s.id %>">
+                  <input type="hidden" name="status" value="rescheduled">
+                  <input type="hidden" name="note"   value="<%= s.note || '' %>">
+                  <div class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                      <label style="font-size:11px;color:var(--ash);font-weight:600">
+                        <%= lang==='vi' ? 'Ngày học mới *' : 'New session date *' %>
+                      </label>
+                      <input type="date" name="session_date" class="form-control form-control-sm"
+                             value="<%= s.session_date ? new Date(s.session_date).toISOString().split('T')[0] : '' %>"
+                             required>
+                    </div>
+                    <div class="col-md-2">
+                      <label style="font-size:11px;color:var(--ash);font-weight:600">
+                        <%= lang==='vi' ? 'Giờ bắt đầu' : 'Start time' %>
+                      </label>
+                      <input type="time" name="start_time" class="form-control form-control-sm"
+                             value="<%= fmtTime(s.start_time) %>">
+                    </div>
+                    <div class="col-md-2">
+                      <label style="font-size:11px;color:var(--ash);font-weight:600">
+                        <%= lang==='vi' ? 'Giờ kết thúc' : 'End time' %>
+                      </label>
+                      <input type="time" name="end_time" class="form-control form-control-sm"
+                             value="<%= fmtTime(s.end_time) %>">
+                    </div>
+                    <div class="col-md-2">
+                      <label style="font-size:11px;color:var(--ash);font-weight:600">
+                        <%= lang==='vi' ? 'Giáo viên' : 'Teacher' %>
+                      </label>
+                      <select name="teacher_id" class="form-select form-select-sm">
+                        <option value=""><%= lang==='vi' ? '— Giữ nguyên' : '— Keep current' %></option>
+                        <% teachers.forEach(t => { %>
+                        <option value="<%= t.id %>" <%= s.teacher_id == t.id ? 'selected' : '' %>>
+                          [<%= t.teacher_code %>] <%= t.full_name %>
+                        </option>
+                        <% }) %>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <label style="font-size:11px;color:var(--ash);font-weight:600">
+                        <%= lang==='vi' ? 'Phòng học' : 'Classroom' %>
+                      </label>
+                      <select name="classroom_id" class="form-select form-select-sm">
+                        <option value=""><%= lang==='vi' ? '— Giữ nguyên' : '— Keep current' %></option>
+                        <% classrooms.forEach(cr => { %>
+                        <option value="<%= cr.id %>" <%= s.classroom_id == cr.id ? 'selected' : '' %>>
+                          [<%= cr.room_code %>] <%= cr.room_name %>
+                        </option>
+                        <% }) %>
+                      </select>
+                    </div>
+                    <div class="col-md-1">
+                      <button type="submit" class="btn btn-sm btn-primary w-100">
+                        <i class="bi bi-check2"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </td>
+            </tr>
+            <% } %>
             <% }) %>
           </tbody>
         </table>
         <% } %>
       </div>
     </div>
+
+<script>
+function handleStatusChange(sessionId, status) {
+  const rescheduleRow = document.getElementById('reschedule-row-' + sessionId);
+  const quickSubmit   = document.getElementById('quick-submit-' + sessionId);
+  if (status === 'rescheduled') {
+    if (rescheduleRow) rescheduleRow.style.display = '';
+    if (quickSubmit)   quickSubmit.style.display   = 'none';
+  } else {
+    if (rescheduleRow) rescheduleRow.style.display = 'none';
+    if (quickSubmit)   quickSubmit.style.display   = '';
+  }
+}
+</script>
 
   </div>
 

@@ -96,9 +96,11 @@ module.exports = {
   },
 
   async show(req, res) {
-    const [cls, sessions] = await Promise.all([
+    const [cls, sessions, opts, holidayCount] = await Promise.all([
       classModel.findById(req.params.id),
       classModel.getSessions(req.params.id),
+      classModel.getFormOptions(),
+      classModel.countHolidaySessions(req.params.id),
     ]);
     if (!cls) return res.status(404).render('error', { layout: false, code: 404, message: 'Class not found' });
 
@@ -109,6 +111,9 @@ module.exports = {
       cls,
       sessions,
       validNextStatuses,
+      teachers:          opts.teachers,
+      classrooms:        opts.classrooms,
+      holidayCount,
     });
   },
 
@@ -169,11 +174,31 @@ module.exports = {
 
   async updateSession(req, res) {
     const { id, sessionId } = req.params;
-    const { status, note } = req.body;
+    const { status, note, session_date, start_time, end_time, teacher_id, classroom_id } = req.body;
     try {
-      await classModel.updateSession(sessionId, { status, note });
+      await classModel.updateSession(sessionId, {
+        status, note, session_date, start_time, end_time, teacher_id, classroom_id,
+      });
       req.flash('success', res.locals.t('classes.session_updated') || 'Đã cập nhật buổi học');
     } catch (err) {
+      req.flash('error', err.message);
+    }
+    res.redirect(`/classes/${id}#sessions`);
+  },
+
+  async cancelHolidaySessions(req, res) {
+    const { id } = req.params;
+    try {
+      const count = await classModel.batchCancelHolidaySessions(id);
+      if (count === 0) {
+        req.flash('error', res.locals.t('classes.no_holiday_sessions') || 'Không có buổi nào trùng ngày nghỉ lễ');
+      } else {
+        req.flash('success',
+          (res.locals.t('classes.holiday_cancelled') || 'Đã hủy %d buổi trùng lịch nghỉ lễ').replace('%d', count)
+        );
+      }
+    } catch (err) {
+      console.error('[class.cancelHolidaySessions]', err);
       req.flash('error', err.message);
     }
     res.redirect(`/classes/${id}#sessions`);

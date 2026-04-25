@@ -18,7 +18,7 @@ Timeslots         ████████████████████ 1
 Classrooms        ████████████████████ 100%
 Schedule Lines    ████████████████████ 100%
 Classes           ████████████████████ 100%
-Class Sessions    ████████████░░░░░░░░  60%  (auto-gen ✓ | reschedule/holiday UI ✗)
+Class Sessions    ████████████████████ 100%
 Enrollments       ░░░░░░░░░░░░░░░░░░░░   0%
 Attendance        ░░░░░░░░░░░░░░░░░░░░   0%
 Finance           ░░░░░░░░░░░░░░░░░░░░   0%
@@ -133,11 +133,12 @@ Finance           ░░░░░░░░░░░░░░░░░░░░  
 - [x] Controller + Routes (9 routes)
 - [x] View: index + form + show
 
-#### Class Sessions (partial)
+#### Class Sessions ✅
 - [x] Auto-generate khi tạo class
 - [x] Cập nhật trạng thái buổi học (scheduled/completed/cancelled/rescheduled)
-- [ ] UI đổi lịch / học bù (rescheduled) — chưa có form riêng
-- [ ] UI nghỉ lễ batch cancel
+- [x] Auto-sync `sessions_completed` counter (transaction-safe COUNT)
+- [x] UI đổi lịch: inline reschedule row với date/time/teacher/classroom mới
+- [x] UI batch cancel buổi trùng ngày nghỉ lễ (`POST /classes/:id/cancel-holidays`)
 
 ---
 

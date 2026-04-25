@@ -32,7 +32,10 @@
       "Bash(node --check src/controllers/classController.js)",
       "Bash(node --check src/routes/classes.js)",
       "Bash(node -e \"require\\('./locales/vi.json'\\); require\\('./locales/en.json'\\); console.log\\('JSON OK'\\)\")",
-      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(list\\(d.keys\\(\\)\\)\\)\")"
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(list\\(d.keys\\(\\)\\)\\)\")",
+      "Bash(node -e \"require\\('./src/models/classModel'\\)\")",
+      "Bash(node -e \"require\\('./src/controllers/classController'\\)\")",
+      "Bash(node -e \"require\\('./src/routes/classes'\\)\")"
     ]
   }
 }
