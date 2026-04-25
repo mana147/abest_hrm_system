@@ -137,7 +137,7 @@ body {
   text-decoration: none; border: 1px solid var(--hairline);
   transition: background 0.15s;
 }
-.lp-btn-ghost:hover { background: var(--cloud); color: var(--ink); }
+.lp-btn-ghost:hover { background: var(--cloud); color: var(--rausch-deep);  }
 
 .lp-btn-white {
   display: inline-flex; align-items: center;
