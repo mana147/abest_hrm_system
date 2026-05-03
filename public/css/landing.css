@@ -68,8 +68,10 @@ body {
   transition: background 0.15s, color 0.15s;
 }
 .lp-nav-links a:hover { background: rgba(0,0,0,0.05); color: var(--navy); }
-.lp-nav-toggle { display: none; border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.95); color: var(--navy); width: 44px; height: 44px; border-radius: 14px; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
-.lp-nav-toggle:hover { background: rgba(0,0,0,0.06); }
+.lp-nav-toggle { display: none; border: 1px solid rgba(255,255,255,0.28); background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.95); width: 44px; height: 44px; border-radius: 14px; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s; }
+.lp-nav-toggle:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
+.lp-nav.scrolled .lp-nav-toggle { border-color: rgba(0,0,0,0.08); background: rgba(255,255,255,0.95); color: var(--navy); }
+.lp-nav.scrolled .lp-nav-toggle:hover { background: rgba(0,0,0,0.06); }
 .lp-mobile-menu { position: absolute; top: 100%; left: 0; right: 0; padding: 14px 18px 18px; background: rgba(255,255,255,0.96); border-bottom: 1px solid rgba(0,0,0,0.08); box-shadow: 0 24px 48px rgba(0,0,0,0.10); z-index: 999; display: none; }
 .lp-mobile-menu.show { display: block; }
 .lp-nav-links-mobile { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
