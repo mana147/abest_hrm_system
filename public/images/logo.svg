@@ -1,0 +1,33 @@
+<svg viewBox="0 0 170 170" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="bgNavy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#0a1d3a"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0d28a"/>
+      <stop offset="50%" stop-color="#d4b46a"/>
+      <stop offset="100%" stop-color="#a08442"/>
+    </linearGradient>
+  </defs>
+  <circle cx="85" cy="85" r="82" fill="url(#bgNavy)"/>
+  <circle cx="85" cy="85" r="78" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <circle cx="85" cy="85" r="71" fill="none" stroke="url(#gold)" stroke-width="1"/>
+  <line x1="85" y1="14" x2="85" y2="22" stroke="url(#gold)" stroke-width="2"/>
+  <line x1="85" y1="148" x2="85" y2="156" stroke="url(#gold)" stroke-width="2"/>
+  <line x1="14" y1="85" x2="22" y2="85" stroke="url(#gold)" stroke-width="2"/>
+  <line x1="148" y1="85" x2="156" y2="85" stroke="url(#gold)" stroke-width="2"/>
+  <g fill="url(#gold)">
+    <g transform="translate(34, 85)">
+      <path d="M 0 -3 L 0.85 -0.85 L 3 0 L 0.85 0.85 L 0 3 L -0.85 0.85 L -3 0 L -0.85 -0.85 Z"/>
+    </g>
+    <g transform="translate(136, 85)">
+      <path d="M 0 -3 L 0.85 -0.85 L 3 0 L 0.85 0.85 L 0 3 L -0.85 0.85 L -3 0 L -0.85 -0.85 Z"/>
+    </g>
+  </g>
+  <text x="85" y="112" font-family="'Trajan Pro', 'Cinzel', 'Times New Roman', serif" font-size="100" font-weight="700" fill="url(#gold)" text-anchor="middle">A</text>
+  <g transform="translate(85, 130)">
+    <line x1="-22" y1="0" x2="22" y2="0" stroke="url(#gold)" stroke-width="1.2"/>
+    <circle cx="0" cy="0" r="2" fill="url(#gold)"/>
+  </g>
+</svg>

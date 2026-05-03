@@ -7,6 +7,7 @@
   <meta name="description" content="<%= lang==='vi' ? 'ABest tập trung vào TOEIC & IELTS với lộ trình đạt điểm cao, giáo viên chuyên sâu và cam kết đầu ra.' : 'ABest is dedicated to TOEIC & IELTS with expert coaching, proven paths, and performance commitment.' %>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="/images/logo.svg" as="image" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -18,39 +19,7 @@
 <nav class="lp-nav" id="lpNav">
   <div class="lp-nav-inner">
     <a href="/" class="lp-logo">
-      <svg class="lp-logo-icon" width="38" height="38" viewBox="0 0 170 170" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="bgNavyIcon" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#1e3a5f"></stop>
-            <stop offset="100%" stop-color="#0a1d3a"></stop>
-          </linearGradient>
-          <linearGradient id="goldIcon" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#f0d28a"></stop>
-            <stop offset="50%" stop-color="#d4b46a"></stop>
-            <stop offset="100%" stop-color="#a08442"></stop>
-          </linearGradient>
-        </defs>
-        <circle cx="85" cy="85" r="82" fill="url(#bgNavyIcon)"></circle>
-        <circle cx="85" cy="85" r="78" fill="none" stroke="url(#goldIcon)" stroke-width="2.5"></circle>
-        <circle cx="85" cy="85" r="71" fill="none" stroke="url(#goldIcon)" stroke-width="1"></circle>
-        <line x1="85" y1="14" x2="85" y2="22" stroke="url(#goldIcon)" stroke-width="2"></line>
-        <line x1="85" y1="148" x2="85" y2="156" stroke="url(#goldIcon)" stroke-width="2"></line>
-        <line x1="14" y1="85" x2="22" y2="85" stroke="url(#goldIcon)" stroke-width="2"></line>
-        <line x1="148" y1="85" x2="156" y2="85" stroke="url(#goldIcon)" stroke-width="2"></line>
-        <g fill="url(#goldIcon)">
-          <g transform="translate(34, 85)">
-            <path d="M 0 -3 L 0.85 -0.85 L 3 0 L 0.85 0.85 L 0 3 L -0.85 0.85 L -3 0 L -0.85 -0.85 Z"></path>
-          </g>
-          <g transform="translate(136, 85)">
-            <path d="M 0 -3 L 0.85 -0.85 L 3 0 L 0.85 0.85 L 0 3 L -0.85 0.85 L -3 0 L -0.85 -0.85 Z"></path>
-          </g>
-        </g>
-        <text x="85" y="112" font-family="'Trajan Pro', 'Cinzel', 'Times New Roman', serif" font-size="100" font-weight="700" fill="url(#goldIcon)" text-anchor="middle">A</text>
-        <g transform="translate(85, 130)">
-          <line x1="-22" y1="0" x2="22" y2="0" stroke="url(#goldIcon)" stroke-width="1.2"></line>
-          <circle cx="0" cy="0" r="2" fill="url(#goldIcon)"></circle>
-        </g>
-      </svg>
+      <img class="lp-logo-icon" src="/images/logo.svg" width="38" height="38" alt="ABest logo">
       <span class="lp-logo-text">
         A Best
         <span class="lp-logo-tagline">Excellence in Language</span>
@@ -417,39 +386,7 @@
     <div class="lp-footer-grid">
       <div class="lp-footer-brand">
         <a href="/" class="lp-logo">
-          <svg class="lp-logo-icon" width="38" height="38" viewBox="0 0 170 170" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <defs>
-              <linearGradient id="bgNavyIconFooter" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#1e3a5f"></stop>
-                <stop offset="100%" stop-color="#0a1d3a"></stop>
-              </linearGradient>
-              <linearGradient id="goldIconFooter" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#f0d28a"></stop>
-                <stop offset="50%" stop-color="#d4b46a"></stop>
-                <stop offset="100%" stop-color="#a08442"></stop>
-              </linearGradient>
-            </defs>
-            <circle cx="85" cy="85" r="82" fill="url(#bgNavyIconFooter)"></circle>
-            <circle cx="85" cy="85" r="78" fill="none" stroke="url(#goldIconFooter)" stroke-width="2.5"></circle>
-            <circle cx="85" cy="85" r="71" fill="none" stroke="url(#goldIconFooter)" stroke-width="1"></circle>
-            <line x1="85" y1="14" x2="85" y2="22" stroke="url(#goldIconFooter)" stroke-width="2"></line>
-            <line x1="85" y1="148" x2="85" y2="156" stroke="url(#goldIconFooter)" stroke-width="2"></line>
-            <line x1="14" y1="85" x2="22" y2="85" stroke="url(#goldIconFooter)" stroke-width="2"></line>
-            <line x1="148" y1="85" x2="156" y2="85" stroke="url(#goldIconFooter)" stroke-width="2"></line>
-            <g fill="url(#goldIconFooter)">
-              <g transform="translate(34, 85)">
-                <path d="M 0 -3 L 0.85 -0.85 L 3 0 L 0.85 0.85 L 0 3 L -0.85 0.85 L -3 0 L -0.85 -0.85 Z"></path>
-              </g>
-              <g transform="translate(136, 85)">
-                <path d="M 0 -3 L 0.85 -0.85 L 3 0 L 0.85 0.85 L 0 3 L -0.85 0.85 L -3 0 L -0.85 -0.85 Z"></path>
-              </g>
-            </g>
-            <text x="85" y="112" font-family="'Trajan Pro', 'Cinzel', 'Times New Roman', serif" font-size="100" font-weight="700" fill="url(#goldIconFooter)" text-anchor="middle">A</text>
-            <g transform="translate(85, 130)">
-              <line x1="-22" y1="0" x2="22" y2="0" stroke="url(#goldIconFooter)" stroke-width="1.2"></line>
-              <circle cx="0" cy="0" r="2" fill="url(#goldIconFooter)"></circle>
-            </g>
-          </svg>
+          <img class="lp-logo-icon" src="/images/logo.svg" width="38" height="38" alt="ABest logo">
           <span class="lp-logo-text">
             A Best
             <span class="lp-logo-tagline">Excellence in Language</span>
