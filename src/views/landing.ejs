@@ -25,6 +25,10 @@
       </span>
     </a>
 
+    <button class="lp-nav-toggle d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#lpMobileMenu" aria-controls="lpMobileMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="bi bi-list"></i>
+    </button>
+
     <ul class="lp-nav-links">
       <li><a href="#courses"><%= lang==='vi' ? 'Khóa học' : 'Courses' %></a></li>
       <li><a href="#why"><%= lang==='vi' ? 'Tại sao ABest?' : 'Why ABest?' %></a></li>
@@ -32,7 +36,7 @@
       <li><a href="#contact"><%= lang==='vi' ? 'Liên hệ' : 'Contact' %></a></li>
     </ul>
 
-    <div class="d-flex align-items-center gap-2">
+    <div class="lp-nav-actions d-flex align-items-center gap-2">
       <div class="lp-lang-group">
         <a href="/language/vi" class="lp-lang-btn <%= lang==='vi' ? 'active' : '' %>">VI</a>
         <a href="/language/en" class="lp-lang-btn <%= lang==='en' ? 'active' : '' %>">EN</a>
@@ -40,9 +44,24 @@
       <a href="/auth/login" class="lp-btn-ghost d-none d-md-inline-flex">
         <%= lang==='vi' ? 'Đăng nhập' : 'Login' %>
       </a>
-      <a href="#contact" class="lp-btn-primary">
-        <%= lang==='vi' ? 'Đăng ký ngay' : 'Enroll Now' %>
-      </a>
+    </div>
+  </div>
+
+  <div class="lp-mobile-menu collapse" id="lpMobileMenu">
+    <ul class="lp-nav-links-mobile">
+      <li><a href="#courses"><%= lang==='vi' ? 'Khóa học' : 'Courses' %></a></li>
+      <li><a href="#why"><%= lang==='vi' ? 'Tại sao ABest?' : 'Why ABest?' %></a></li>
+      <li><a href="#teachers"><%= lang==='vi' ? 'Giáo viên' : 'Teachers' %></a></li>
+      <li><a href="#contact"><%= lang==='vi' ? 'Liên hệ' : 'Contact' %></a></li>
+    </ul>
+    <div class="lp-mobile-actions">
+      <div class="lp-lang-group">
+        <a href="/language/vi" class="lp-lang-btn <%= lang==='vi' ? 'active' : '' %>">VI</a>
+        <a href="/language/en" class="lp-lang-btn <%= lang==='en' ? 'active' : '' %>">EN</a>
+      </div>
+      <div class="lp-mobile-buttons">
+        <a href="/auth/login" class="lp-btn-ghost"> <%= lang==='vi' ? 'Đăng nhập' : 'Login' %> </a>
+      </div>
     </div>
   </div>
 </nav>
@@ -449,6 +468,19 @@ function handleContact(e) {
   alert('<%= lang==="vi" ? "Đã nhận thông tin! Chúng tôi sẽ liên hệ trong vòng 30 phút." : "Received! We will contact you within 30 minutes." %>');
   e.target.reset();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const mobileMenu = document.getElementById('lpMobileMenu');
+  if (!mobileMenu || typeof bootstrap === 'undefined') return;
+
+  document.querySelectorAll('.lp-mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (mobileMenu.classList.contains('show')) {
+        new bootstrap.Collapse(mobileMenu).hide();
+      }
+    });
+  });
+});
 
 
 document.querySelectorAll('a[href^="#"]').forEach(a => {

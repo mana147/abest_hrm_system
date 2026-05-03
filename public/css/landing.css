@@ -68,6 +68,18 @@ body {
   transition: background 0.15s, color 0.15s;
 }
 .lp-nav-links a:hover { background: rgba(0,0,0,0.05); color: var(--navy); }
+.lp-nav-toggle { display: none; border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.95); color: var(--navy); width: 44px; height: 44px; border-radius: 14px; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.lp-nav-toggle:hover { background: rgba(0,0,0,0.06); }
+.lp-mobile-menu { position: absolute; top: 100%; left: 0; right: 0; padding: 14px 18px 18px; background: rgba(255,255,255,0.96); border-bottom: 1px solid rgba(0,0,0,0.08); box-shadow: 0 24px 48px rgba(0,0,0,0.10); z-index: 999; display: none; }
+.lp-mobile-menu.show { display: block; }
+.lp-nav-links-mobile { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.lp-nav-links-mobile li a { display: block; padding: 12px 0; color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.lp-nav-links-mobile li a:hover { color: var(--rausch); }
+.lp-mobile-actions { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
+.lp-mobile-buttons { display: flex; flex-direction: column; gap: 10px; }
+.lp-mobile-buttons .lp-btn-ghost,
+.lp-mobile-buttons .lp-btn-primary { width: 100%; justify-content: center; }
+.lp-nav-actions { display: flex; }
 .lp-nav:not(.scrolled) .lp-logo-text,
 .lp-nav:not(.scrolled) .lp-nav-links a,
 .lp-nav:not(.scrolled) .lp-btn-ghost { color: rgba(255,255,255,0.9); }
@@ -346,21 +358,45 @@ body {
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 992px) {
   .lp-nav-links { display: none; }
-  .lp-footer-grid { grid-template-columns: 1fr 1fr; }
-  .lp-stats { flex-wrap: wrap; justify-content: center; }
+  .lp-nav-actions { display: none; }
+  .lp-nav-actions .lp-lang-group { display: none; }
+  .lp-nav-toggle { display: inline-flex; }
+  .lp-nav-inner { justify-content: space-between; padding: 0 18px; }
+  .lp-hero-content { padding: 110px 18px 60px; }
+  .lp-stats { flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .lp-footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
 }
 @media (max-width: 768px) {
-  .lp-section { padding: 60px 0; }
-  .lp-hero-content { padding: 100px 16px 64px; }
-  .lp-cta-card { padding: 40px 28px; }
+  .lp-section { padding: 50px 0; }
+  .lp-hero-content { padding: 120px 18px 60px; }
+  .lp-hero-title { font-size: clamp(32px, 7vw, 48px); }
+  .lp-hero-sub { max-width: 100%; }
+  .lp-hero-actions { flex-direction: column; align-items: stretch; }
+  .lp-btn-primary, .lp-btn-secondary, .lp-btn-white { width: 100%; justify-content: center; }
   .lp-form-row { flex-direction: column; }
-  .lp-btn-white { width: 100%; justify-content: center; }
-  .lp-footer-grid { grid-template-columns: 1fr 1fr; }
-  .lp-footer-bottom { flex-direction: column; gap: 12px; }
+  .lp-footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .lp-footer-bottom { flex-direction: column; gap: 12px; align-items: flex-start; }
 }
 @media (max-width: 480px) {
-  .lp-footer-grid { grid-template-columns: 1fr; }
-  .lp-hero-actions { flex-direction: column; }
-  .lp-stats { padding: 16px; }
-  .lp-stat { padding: 0 16px; }
+  .lp-nav-inner { padding: 0 14px; }
+  .lp-hero-content { padding: 110px 16px 50px; }
+  .lp-hero-title { font-size: clamp(28px, 9vw, 40px); }
+  .lp-hero-sub { font-size: 15px; margin-bottom: 28px; }
+  .lp-hero-actions { gap: 10px; }
+  .lp-footer-grid { grid-template-columns: 1fr; gap: 24px; }
+  .lp-footer-bottom { justify-content: center; text-align: center; }
+  .lp-stats { padding: 14px; }
+  .lp-stat { padding: 0 12px; }
+}
+@media (max-width: 414px) {
+  :root { font-size: 14px; }
+  .lp-nav { padding-top: env(safe-area-inset-top); }
+  .lp-nav-inner { min-height: 72px; }
+  .lp-hero-content { padding-top: calc(100px + env(safe-area-inset-top)); }
+  .lp-logo-text { font-size: 18px; }
+  .lp-logo-tagline { font-size: 8px; }
+  .lp-hero-badge { font-size: 12px; padding: 5px 12px; }
+  .lp-hero-title { line-height: 1.1; }
+  .lp-hero-sub { max-width: 100%; }
+  .lp-footer-bottom { flex-direction: column; align-items: center; }
 }
