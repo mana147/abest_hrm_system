@@ -51,8 +51,7 @@ body {
   border-radius: 6px; display: inline-block;
 }
 .lp-logo-text {
-  font-family: 'Inter', -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif;
-  font-size: 20px; font-weight: 800;
+  font-family: var(--font-heading); font-size: 30px; font-weight: 700;
   color: var(--navy); letter-spacing: -2px; display: inline-flex;
   flex-direction: column; line-height: 1.1;
 }
@@ -395,7 +394,7 @@ body {
   .lp-nav { padding-top: env(safe-area-inset-top); }
   .lp-nav-inner { min-height: 72px; }
   .lp-hero-content { padding-top: calc(100px + env(safe-area-inset-top)); }
-  .lp-logo-text { font-size: 18px; }
+  .lp-logo-text { font-size: 20px; }
   .lp-logo-tagline { font-size: 8px; }
   .lp-hero-badge { font-size: 12px; padding: 5px 12px; }
   .lp-hero-title { line-height: 1.1; }
